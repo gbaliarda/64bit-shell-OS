@@ -16,11 +16,10 @@ void exceptionDispatcher(int exception) {
 }
 
 static void zero_division() {
-	// Handler para manejar excepcíon
 	ncPrint("Exception 0: Division by zero.\n");
 }
 
-static void opcode_exception(){
+static void opcode_exception() {
 	ncPrint("Exception 6: Invalid opcode.\n");
 }	
 

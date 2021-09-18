@@ -3,13 +3,11 @@
 
 static int sysNum;
 
-void loadSysNum(int64_t rax)
-{
+void loadSysNum(int64_t rax) {
   sysNum = rax;
 }
 
-int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2)
-{
+int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2) {
   switch (sysNum) {
     case 0:
         return read((char*) arg0, (int) arg1, (int*) arg2);

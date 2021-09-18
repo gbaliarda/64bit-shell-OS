@@ -23,8 +23,7 @@ int64_t write(uint64_t fd, const char* buf, uint64_t count) {
   }
 }
 
-int read(char* buf, int limit, int *changed) 
-{
+int read(char* buf, int limit, int *changed) {
   int count = 0;
 
   while (count < limit || limit == -1)
@@ -41,7 +40,7 @@ int read(char* buf, int limit, int *changed)
 
       case '\n':
         ncNewline();
-        buf[count] = 0; // Termina en 0
+        buf[count] = 0;
         return count;
 
       case 8:
@@ -66,7 +65,6 @@ int read(char* buf, int limit, int *changed)
       default: 
         if(mayus && key >= 'a' && key <= 'z')
         key -= 'a' - 'A';
-        // Solo guardamos hasta 100 caracteres en el comando, el resto se imprimiran solamente
         if (count < 100)
           buf[count] = key;
         count++;
@@ -74,8 +72,8 @@ int read(char* buf, int limit, int *changed)
         break;
     }
 	}
-  buf[count] = 0; // Termina en 0
-  return (count >= 100) ? 100 : count; // Como solo se guardan hasta 100 caracteres en el buffer, se retornan hasta 100
+  buf[count] = 0;
+  return (count >= 100) ? 100 : count;
 }
 
 void loadRegisters(Registers* registers, Registers *from) {
@@ -96,12 +94,10 @@ void loadRegisters(Registers* registers, Registers *from) {
 	registers->r15 = from->r15;
 }
 
-// Devuelve el ultimo estado guardado de los registros
 void inforeg(Registers *registers) {
   loadRegisters(registers, backupRegisters);
 }
 
-// Guarda un backup auxiliar, por si la tecla es F1 y necesitamos quedarnoslo
 void saveBackup() {
   saveState(backupAuxRegisters);
 }
@@ -109,6 +105,8 @@ void saveBackup() {
 void printmem(uint64_t pointer) {
   uint8_t *arr = (uint8_t*) pointer;
   for (int i = 0; i < 32; i++){
+    if(arr[i] <= 0xF)
+      ncPrint("0");
     ncPrintHex(arr[i]);
     ncPrint(" ");
   }
@@ -119,6 +117,6 @@ void getDateTime(Time *dayTime) {
   getTimeRTC(dayTime);
 }
 
-void clearScreen(){
+void clearScreen() {
   ncClear();
 }

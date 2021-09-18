@@ -4,7 +4,6 @@ EXTERN syscallDispatcher
 
 SECTION .text
 
-; en rax viene el numero de syscall a ejecutar
 syscallHandler:
 	pushState
   push rdi
@@ -13,10 +12,9 @@ syscallHandler:
   pop rdi
   call syscallDispatcher
 	popState
-	iretq            ; ret especifico para volver de interrupciones    
+	iretq                
 
 %macro pushState 0
-	; push rax 			 ; no pusheamos rax porque se usa luego para retornar en la syscall
 	push rbx
 	push rcx
 	push rdx
@@ -48,5 +46,4 @@ syscallHandler:
 	pop rdx
 	pop rcx
 	pop rbx
-	; pop rax
 %endmacro

@@ -64,22 +64,21 @@ SECTION .text
 
 %macro irqHandlerMaster 1
 	pushState
-	cli ; linea agregada para que no se puede interrumpir las interrupciones de hardware. Para atender de a una interrupcion a la vez.
+	cli
 	
 	mov rax, %1
 	cmp rax, 1
 	jne .continue
-	call saveBackup ; si tenemos una interrupcion de teclado, guardamos una copia de los registros en ese momento, por las dudas que necesitemos almacenarlos
+	call saveBackup
 
 .continue:
-	mov rdi, %1 ; pasaje de parametro
+	mov rdi, %1
 	call irqDispatcher
 
-	; signal pic EOI (End of Interrupt)
 	mov al, 20h
 	out 20h, al
 
-	sti ; linea agregada para deshabilitar que no se pueda interrumpir las interrupciones de hardware
+	sti
 	popState
 	iretq
 %endmacro
@@ -88,17 +87,17 @@ SECTION .text
 
 %macro exceptionHandler 1
 	pushState
-	mov rdi, %1 ; pasaje de parametro
+	mov rdi, %1
 	call exceptionDispatcher
 	call dumpRegs
 	popState
-	pop rax ; rip esta arriba del stack
-	printReg rax, 14 ; imprime el IP de donde se produjo la exception
+	pop rax
+	printReg rax, 14
 
 	call rebootConsole
 
 	mov rax, 400000h 								; IP del inicio de sampleCodeModule
-	push rax											  ; pusheamos ese IP para retornar a el con iretq
+	push rax
 	mov qword [rsp+24], 10CFD0h 		; pisamos el stack pointer dentro del stack frame de interrupcion con el del inicio de sampleCodeModule
 
 	iretq
@@ -201,8 +200,7 @@ haltcpu:
 	ret
 
 section .rodata
-	; dd = 4 byte value. Hacemos un "array" donde cada posicion es de 4 bytes (cada caracter ocupa 1 byte, de esta forma todos terminan en 0)
-	regsNames dd "rdi", "rsi", "rax", "rbx", "rcx", "rdx", "r8 ", "r9 ", "r10", "r11", "r12", "r13", "r14", "r15", "rip", "rsp", "rbp" ; 17 registros
+	regsNames dd "rdi", "rsi", "rax", "rbx", "rcx", "rdx", "r8 ", "r9 ", "r10", "r11", "r12", "r13", "r14", "r15", "rip", "rsp", "rbp"
 
 section .bss
 	aux resq 1

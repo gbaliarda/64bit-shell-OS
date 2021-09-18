@@ -16,12 +16,10 @@ static unsigned char actualKey;
 
 void keyboard_handler() {
     unsigned char key = getKey();
-    // Guardamos solo las letras que tenemos en la tabla, el resto las ignoramos
     if (key < 183)
       actualKey = ASCIITable[key];
 }
 
-// Retorna la key y la destruye
 unsigned char getInput() {
   if (!actualKey)
     return 0;

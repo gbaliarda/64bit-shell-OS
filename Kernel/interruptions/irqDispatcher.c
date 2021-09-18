@@ -5,7 +5,7 @@
 static void int_20();
 static void int_21();
 
-static void (*p[2])() = {int_20, int_21}; // Arreglo de punteros a funcion
+static void (*p[2])() = {int_20, int_21};
 
 void irqDispatcher(uint64_t irq) {
 	(*p[irq])();

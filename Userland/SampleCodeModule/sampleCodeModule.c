@@ -5,44 +5,40 @@ void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue);
 void executeCommand(char * buffer) {
 	int index = 0;
 	char command[21];
-	char args[5][21]; //Matriz de hasta 5 argumentos con 20 de longitud cada uno
+	char args[5][21];
 
 	while (index < 20 && buffer[index] && buffer[index] != ' ') {
 		command[index] = buffer[index];
 		index++;
 	}
 
-	// Comando demasiado largo, no se encuentra
 	if (index == 20 && buffer[index] != ' ') {
 		printf("Command not found\n");
 		return;
 	}
 
 	command[index] = 0;
-	while (buffer[index] && buffer[index] == ' ') //Si tiene argumentos despues 
-		index++; // Salteamos los espacios
+	while (buffer[index] && buffer[index] == ' ') 
+		index++;
 
 	int argNum = 0;	
 	while (argNum < 5 && buffer[index]) {
 		int indexArg = 0;
-		// Leemos argumento
+
 		while (indexArg < 20 && buffer[index] && buffer[index] != ' '){
 			args[argNum][indexArg] = buffer[index];
 			indexArg++;
 			index++;
 		}
 			
-		args[argNum][indexArg] = 0; //0 final del argumento 
+		args[argNum][indexArg] = 0;
 		argNum++;
 
-		// Si el argumento era muy largo, se guarda una parte y el resto se descarta
 		while (buffer[index] && buffer[index] != ' ')
 			index++;
 		
-		// Avanzo al proximo argumento
 		while (buffer[index] && buffer[index] == ' ')
-			index++;
-			
+			index++;	
 	}
 
 	if (compareStrings(command, "help")) {

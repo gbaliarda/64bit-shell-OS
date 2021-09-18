@@ -35,14 +35,13 @@ typedef struct cpuidRegisters{
 } cpuidRegisters;
 
 typedef struct cpuInformation {
-  //EAX = 1
-  // Processor Info EDX
+  // Processor Info 
   unsigned char mmx;
   unsigned char sse;
   unsigned char sse2;
   
 
-  // Processor Info ECX
+  // Processor Info 
   unsigned char sse3;
   unsigned char pclmulqdq;
   unsigned char vmx;
@@ -54,11 +53,10 @@ typedef struct cpuInformation {
   unsigned char avx;
   unsigned char f16c;
 
-  //EAX = 7
-  // Extended Features ECX
+  // Extended Features 
   unsigned char vaes;
   unsigned char vpclmulqdq;
-  // Extended Features EBX
+  // Extended Features 
   unsigned char avx2;
 } cpuInformation;
 
@@ -97,7 +95,6 @@ void throwInvalidOpcode();
 
 void sys_clearScreen();
 
-// Retorna 0 si las raices son imaginarias, 1 si son reales
 int computeZeros(double a, double b, double c, double *root1, double *root2);
 
 void divZero();

@@ -56,7 +56,6 @@ divZero:
 
 
 computeZeros:
-  ; cargamos los argumentos
   movq [a], xmm0               ; movq = move qword
   movq [b], xmm1
   movq [c], xmm2
@@ -71,7 +70,6 @@ computeZeros:
   fmulp st1                    ; stack: b*b, -4*a*c
   faddp st1                    ; stack: b*b - 4*a*c
 
-  ; checkeamos si el discriminante es negativo, en cuyo cortamos la ejecucion
   ftst                         ; test with 0
   fstsw ax
   sahf
@@ -88,14 +86,14 @@ computeZeros:
   fld qword [disc]             ; stack: disc, b, 1/(2*a)
   fsubrp st1                   ; stack: disc - b, 1/(2*a)
   fmulp st1                    ; stack: (-b + disc)/(2*a)
-  ; guardamos la primer raiz en el primer double * que nos pasan por parametro
+
   fstp qword [rdi]
   fld qword [b]                ; stack: b
   fld qword [disc]             ; stack: disc, b
   fchs                         ; stack: -disc, b
   fsubrp st1                   ; stack: -disc - b
   fmul qword [denom]           ; stack: (-b - disc)/(2*a)
-  ; guardamos la segunda raiz en el segundo double *
+
   fstp qword [rsi]
   mov rax, 1
   jmp .exit

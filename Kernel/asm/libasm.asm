@@ -1,5 +1,4 @@
 GLOBAL cpuVendor
-; GLOBAL enableSSE
 
 section .text
 	
