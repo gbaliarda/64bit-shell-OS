@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "naiveconsole.h": "c",
+        "moduleloader.h": "c",
+        "lib.h": "c",
+        "string.h": "c",
+        "stdint.h": "c",
+        "defs.h": "c",
+        "idtloader.h": "c",
+        "interrupts.h": "c",
+        "syscalls.h": "c",
+        "keyboard.h": "c",
+        "cstdint": "c",
+        "random": "c"
+    }
+}
