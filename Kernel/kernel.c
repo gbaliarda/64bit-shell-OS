@@ -92,6 +92,13 @@ int main() {
 
 	initializeShells();
 
+	ncPrintHex((uint64_t) ptr1);
+	ncNewline();
+	ncPrintHex((uint64_t) ptr2);
+	ncNewline();
+	ncPrintHex((uint64_t) ptr3);
+	ncNewline();
+
 	runShells();
 
 	return 0;
