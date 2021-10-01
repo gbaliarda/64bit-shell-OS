@@ -21,7 +21,7 @@ static const uint64_t PageSize = 0x1000;
 
 static void * const sampleCodeModuleAddress = (void*)0x400000;
 static void * const sampleDataModuleAddress = (void*)0x500000;
-static void * const heapModuleAddress = (void*)0x1000000;
+static void * const heapModuleAddress = (void*)0x600000;
 static void * const memoryManagerAddress = (void*)0x50000;
 
 typedef int (*EntryPoint)();
@@ -73,31 +73,12 @@ int main() {
 	ncNewline();
 	load_idt();
 
-	ncPrint("Loading memory manager...");
-	ncNewline();
-	MemoryManagerADT memoryManager = createMemoryManager(memoryManagerAddress, heapModuleAddress);
-
-	void *ptr1 = alloc(memoryManager, 100);
-	void *ptr2 = alloc(memoryManager, 200);
-	void *ptr3 = alloc(memoryManager, 300);
-
-	memset(ptr1, 1, 100);
-	memset(ptr2, 2, 200);
-	memset(ptr3, 3, 300);
-
 	ncPrint("Loading Shell...");
 	wait(1);
 	ncNewline();
 	ncClear();
 
 	initializeShells();
-
-	ncPrintHex((uint64_t) ptr1);
-	ncNewline();
-	ncPrintHex((uint64_t) ptr2);
-	ncNewline();
-	ncPrintHex((uint64_t) ptr3);
-	ncNewline();
 
 	runShells();
 

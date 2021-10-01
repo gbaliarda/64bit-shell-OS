@@ -11,3 +11,4 @@
 *.o
 
 .bash_history
+.bashrc

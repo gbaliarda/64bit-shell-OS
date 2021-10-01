@@ -1,7 +1,11 @@
+#ifdef HEAP2
+
 #include "./MemoryManagerADT.h"
 
+// Source: https://github.com/Infineon/freertos/blob/master/Source/portable/MemMang/heap_2.c
+
 #define NULL ((void *) 0)
-#define TOTAL_HEAP_SIZE 134217728
+#define TOTAL_HEAP_SIZE 134217728 // 128MB
 #define MINIMUM_BLOCK_SIZE sizeof(struct MemoryBlock)
 
 typedef unsigned int size_t;
@@ -107,3 +111,5 @@ void free(MemoryManagerADT const memoryManager, void *block) {
 
   // ( void ) xTaskResumeAll();
 }
+
+#endif
