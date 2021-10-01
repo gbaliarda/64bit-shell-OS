@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "syscalls.h"
+#include "../include/mm.h"
 
 static int sysNum;
 
@@ -25,8 +26,16 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2) {
     case 13:
         clearScreen();
         return 1;
+    case 14:
+        return (int64_t) alloc((uint32_t) arg0);
+    case 15:
+        free((void *) arg0);
+        return 1;
+    case 16:
+        memStatus((uint32_t *) arg0);
+        return 1;
 
     default:
-      return -1; 
+      return -1;
   }
 }

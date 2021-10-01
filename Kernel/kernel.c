@@ -3,7 +3,7 @@
 #include <lib.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
-#include "./include/memoryManagerADT.h"
+#include "./include/mm.h"
 // Interrupts
 #include <keyboard.h>
 #include <interrupts.h>

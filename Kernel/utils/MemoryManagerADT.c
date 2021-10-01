@@ -1,14 +1,12 @@
 #ifdef HEAP2
 
-#include "./MemoryManagerADT.h"
+#include "../include/memoryManagerADT.h"
 
 // Source: https://github.com/Infineon/freertos/blob/master/Source/portable/MemMang/heap_2.c
 
 #define NULL ((void *) 0)
-#define TOTAL_HEAP_SIZE 134217728 // 128MB
 #define MINIMUM_BLOCK_SIZE sizeof(struct MemoryBlock)
 
-typedef unsigned int size_t;
 typedef unsigned char uint8_t;
 
 typedef struct MemoryBlock
@@ -37,7 +35,7 @@ MemoryManagerADT createMemoryManager(void *const restrict memoryForMemoryManager
 
 	firstFreeBlock->blockSize = TOTAL_HEAP_SIZE;
 	firstFreeBlock->nextFreeBlock = &memoryManager->end;
-
+  
 	return memoryManager;
 }
 
@@ -52,7 +50,7 @@ static void insertBlockIntoFreeList(MemoryManagerADT memoryManager, MemoryBlock 
 	blockIterator->nextFreeBlock = blockToInsert;
 }
 
-void *alloc(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
+void *allocMem(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
   MemoryBlock *block, *previousBlock;
   void *blockToReturn = NULL;
 
@@ -94,7 +92,7 @@ void *alloc(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
 	return blockToReturn;
 }
 
-void free(MemoryManagerADT const memoryManager, void *block) {
+void freeMem(MemoryManagerADT const memoryManager, void *block) {
   if (block == NULL)
     return;
 
@@ -110,6 +108,18 @@ void free(MemoryManagerADT const memoryManager, void *block) {
   memoryManager->freeBytesRemaining += blockToFree->blockSize;
 
   // ( void ) xTaskResumeAll();
+}
+
+size_t heapSize() {
+  return TOTAL_HEAP_SIZE;
+}
+
+size_t heapLeft(MemoryManagerADT mm) {
+  return mm->freeBytesRemaining;
+}
+
+size_t usedHeap(MemoryManagerADT mm) {
+  return heapSize() - heapLeft(mm);
 }
 
 #endif
