@@ -80,6 +80,10 @@ int main() {
 
 	initMemManager(memoryManagerAddress, heapModuleAddress);
 
+	// Creamos el primer proceso a mano
+	uint64_t firstProcess = (uint64_t) alloc(1024);
+	initFirstProcess(firstProcess + 1024);
+
 	runShell();
 
 	return 0;
