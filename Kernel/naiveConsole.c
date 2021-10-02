@@ -9,11 +9,6 @@ static const uint32_t height = 25;
 static uint8_t * currentVideo = (uint8_t*)0xB8000;
 static char cursor = 0;
 
-void initializeShells() {
-	*currentVideo = '>';
-	currentVideo += 4;
-}
-
 void displayCursor() {
 	if (!cursor) {
 		*currentVideo = '_';

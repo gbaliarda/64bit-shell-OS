@@ -34,7 +34,7 @@ void syscallHandler();
 
 int64_t write(uint64_t fd, const char* buf, uint64_t count);
 
-int read(char *buf, int limit, int *changed);
+int read(char *buf, int limit);
 
 void inforeg();
 

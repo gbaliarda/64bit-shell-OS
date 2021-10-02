@@ -5,15 +5,20 @@
 // Source: https://github.com/Infineon/freertos/blob/master/Source/portable/MemMang/heap_2.c
 
 #define NULL ((void *) 0)
-#define MINIMUM_BLOCK_SIZE sizeof(struct MemoryBlock)
+#define BYTE_ALIGNMENT 8
+#define BYTE_ALIGNMENT_MASK 0x07
 
 typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
 
-typedef struct MemoryBlock
-{
+typedef struct MemoryBlock {
 	struct MemoryBlock *nextFreeBlock;
 	size_t blockSize;
 } MemoryBlock;
+
+static const uint16_t STRUCT_SIZE = ((sizeof(MemoryBlock) + (BYTE_ALIGNMENT - 1)) & ~BYTE_ALIGNMENT_MASK);
+
+#define MINIMUM_BLOCK_SIZE ((size_t)(STRUCT_SIZE * 2))
 
 typedef struct MemoryManagerCDT {
   MemoryBlock start;
@@ -56,10 +61,16 @@ void *allocMem(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
 
 	// vTaskSuspendAll();
 
-  if ( memoryToAllocate > 0 )
-    memoryToAllocate += sizeof(MemoryBlock);
+  if (memoryToAllocate == 0)
+    return NULL;
 
-  if ((memoryToAllocate > 0) && (memoryToAllocate < TOTAL_HEAP_SIZE)) {
+  memoryToAllocate += STRUCT_SIZE;
+    
+  if ((memoryToAllocate & BYTE_ALIGNMENT_MASK) != 0) {
+    memoryToAllocate += (BYTE_ALIGNMENT - (memoryToAllocate & BYTE_ALIGNMENT_MASK));
+  }
+
+  if (memoryToAllocate < TOTAL_HEAP_SIZE) {
     previousBlock = &memoryManager->start;
     block = memoryManager->start.nextFreeBlock;
 
@@ -71,7 +82,7 @@ void *allocMem(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
     if (block == &memoryManager->end)
       return NULL;
 
-    blockToReturn = (void *) (((uint8_t *) previousBlock->nextFreeBlock) + sizeof(MemoryBlock));
+    blockToReturn = (void *) (((uint8_t *) previousBlock->nextFreeBlock) + STRUCT_SIZE);
 
     previousBlock->nextFreeBlock = block->nextFreeBlock;
 
@@ -99,7 +110,7 @@ void freeMem(MemoryManagerADT const memoryManager, void *block) {
   uint8_t *memoryToFree = (uint8_t *) block;
   MemoryBlock *blockToFree;
 
-  memoryToFree -= sizeof(MemoryBlock);
+  memoryToFree -= STRUCT_SIZE;
   blockToFree = (void *) memoryToFree;
 
   // vTaskSuspendAll();

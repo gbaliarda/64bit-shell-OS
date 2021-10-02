@@ -7,7 +7,7 @@ void initMemManager(void *const restrict memoryForMemoryManager, void *const res
   mm = createMemoryManager(memoryForMemoryManager, managedMemory);
 }
 
-void *alloc(size_t memoryToAllocate) {
+void *alloc(unsigned int memoryToAllocate) {
   return allocMem(mm, memoryToAllocate);
 }
 
@@ -15,7 +15,7 @@ void free(void *memoryToFree) {
   return freeMem(mm, memoryToFree);
 }
 
-void memStatus(size_t *status) {
+void memStatus(unsigned int *status) {
   status[0] = heapSize();
   status[1] = heapLeft(mm);
   status[2] = usedHeap(mm);
