@@ -2,17 +2,7 @@ GLOBAL syscallHandler
 EXTERN loadSysNum
 EXTERN syscallDispatcher
 
-SECTION .text
-
-syscallHandler:
-	pushState
-  push rdi
-  mov rdi, rax
-  call loadSysNum
-  pop rdi
-  call syscallDispatcher
-	popState
-	iretq                
+SECTION .text              
 
 %macro pushState 0
 	push rbx
@@ -47,3 +37,13 @@ syscallHandler:
 	pop rcx
 	pop rbx
 %endmacro
+
+syscallHandler:
+	pushState
+  push rdi
+  mov rdi, rax
+  call loadSysNum
+  pop rdi
+  call syscallDispatcher
+	popState
+	iretq 

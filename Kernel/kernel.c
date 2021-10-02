@@ -80,21 +80,6 @@ int main() {
 
 	initMemManager(memoryManagerAddress, heapModuleAddress);
 
-	void *ptr1 = alloc(100);
-	void *ptr2 = alloc(200);
-	void *ptr3 = alloc(300);
-
-	memset(ptr1, 1, 100);
-	memset(ptr2, 2, 200);
-	memset(ptr3, 3, 300);
-
-	ncPrintHex((uint64_t) ptr1);
-	ncNewline();
-	ncPrintHex((uint64_t) ptr2);
-	ncNewline();
-	ncPrintHex((uint64_t) ptr3);
-	ncNewline();
-
 	runShell();
 
 	return 0;
