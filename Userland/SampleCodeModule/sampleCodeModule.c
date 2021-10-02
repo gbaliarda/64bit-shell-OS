@@ -141,33 +141,12 @@ void executeCommand(char * buffer) {
 
 int main() {
 
-	char bufferLeft[101];
-	char bufferRight[101];
-
-	char *buffer;
-	if (sys_consoleInUse())
-		buffer = bufferRight;
-	else
-		buffer = bufferLeft;
-	
-	int changed = 1;
+	char buffer[101];
 
 	while (1) {
-		if (!changed)
-			printf("> ");
-		else
-			changed = 0;
-		scanf(buffer, &changed);
-
-		if (changed) {
-			if (buffer == bufferLeft)
-				buffer = bufferRight;
-			else
-				buffer = bufferLeft;
-			continue;
-		}
+		printf("> ");
+		scanf(buffer);
 		executeCommand(buffer);
-
 	}
 									
 	return 0xDEADBEEF; 

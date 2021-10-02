@@ -62,12 +62,9 @@ typedef struct cpuInformation {
 
 void sys_write(unsigned int fd, const char *buffer, unsigned int count);
 
-int sys_read(char *buffer, int limit, int *changed);
-
-char sys_consoleInUse();
+int sys_read(char *buffer, int limit);
 
 void printf(const char *str);
-
 
 void printReg(const char *regName, uint64_t regValue);
 
@@ -75,9 +72,9 @@ void putChar(char c);
 
 void printInt(unsigned int num);
 
-int scanf(char *buffer, int *changed);
+int scanf(char *buffer);
 
-int getChar(char *buffer, int *changed);
+int getChar(char *buffer);
 
 int compareStrings(char *str1, char *str2);
 

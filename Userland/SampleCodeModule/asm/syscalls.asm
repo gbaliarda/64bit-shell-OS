@@ -37,8 +37,3 @@ sys_clearScreen:
   mov rax, 13
   int 80h
   ret
-
-sys_consoleInUse:
-  mov rax, 14
-  int 80h
-  ret

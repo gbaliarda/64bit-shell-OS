@@ -15,12 +15,12 @@ void putChar(char c) {
   sys_write(1, &c, 1);
 }
 
-int scanf(char *buffer, int *changed) {
-  return sys_read(buffer, -1, changed);
+int scanf(char *buffer) {
+  return sys_read(buffer, -1);
 }
 
-int getChar(char *buffer, int *changed) {
-  return sys_read(buffer, 1, changed);
+int getChar(char *buffer) {
+  return sys_read(buffer, 1);
 }
 
 static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base)

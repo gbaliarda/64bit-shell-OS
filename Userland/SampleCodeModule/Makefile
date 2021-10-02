@@ -16,5 +16,6 @@ $(MODULE): $(ALL_OBJECTS)
 
 clean:
 	rm -rf *.o
+	cd asm; rm -rf *.o;
 
 .PHONY: all clean print

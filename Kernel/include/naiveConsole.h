@@ -13,10 +13,6 @@ void ncPrintBase(uint64_t value, uint32_t base);
 void ncPrintReg(const char *regName, uint64_t regValue);
 void ncClear();
 int ncBackspace();
-void changeConsole();
-char getConsoleInUse(); 
-void divideConsoles();
-void initializeShells();
 void displayCursor();
 void deleteCursor();
 
