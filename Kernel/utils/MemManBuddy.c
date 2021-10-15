@@ -2,13 +2,12 @@
 
 #include "../include/memoryManagerADT.h"
 #include "../include/naiveConsole.h"
+#include <stdint.h>
 
 #define MINIMUM_BLOCK_SIZE 512
 #define NULL ((void *) 0)
 
 typedef unsigned int size_t;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
 
 typedef struct MemoryBlock
 {

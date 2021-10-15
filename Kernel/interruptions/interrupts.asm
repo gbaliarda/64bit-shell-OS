@@ -23,6 +23,7 @@ EXTERN exceptionDispatcher
 EXTERN runShells
 EXTERN rebootConsole
 EXTERN saveBackup
+EXTERN switchProcess
 SECTION .text
 
 
@@ -78,12 +79,19 @@ SECTION .text
 	mov al, 20h
 	out 20h, al
 
+	mov rax, %1
+	cmp rax, 0
+	jne .end
+
+.timerTick:
+	call switchProcess
+	mov rsp, rax
+
+.end:
 	sti
 	popState
 	iretq
 %endmacro
-
-
 
 %macro exceptionHandler 1
 	pushState

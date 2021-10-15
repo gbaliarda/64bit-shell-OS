@@ -4,6 +4,7 @@
 #include <moduleLoader.h>
 #include <naiveConsole.h>
 #include "./include/mm.h"
+#include "./include/scheduler.h"
 // Interrupts
 #include <keyboard.h>
 #include <interrupts.h>
@@ -83,8 +84,19 @@ int main() {
 	// Creamos el primer proceso a mano
 	uint64_t firstProcess = (uint64_t) alloc(1024);
 	initFirstProcess(firstProcess + 1024);
+	// ncPrint("SP esperado: ");
+	/*
+		600410 -> 
+		600408 -> 0x0
+		600400 -> 0x600410
+	*/
+	// ncPrintHex(firstProcess + 1016);
+	// ncNewline();
 
-	runShell();
+	initScheduler();
+	loadProcess(firstProcess + 1024);
+
+	// runShell();
 
 	return 0;
 }
