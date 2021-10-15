@@ -2,6 +2,8 @@
 #define MEMORY_MANAGER_H
 
 #define TOTAL_HEAP_SIZE 134217728 // 128MB
+#define BYTE_ALIGNMENT 8
+#define BYTE_ALIGNMENT_MASK 0x07
 
 typedef struct MemoryManagerCDT *MemoryManagerADT;
 

@@ -5,8 +5,6 @@
 // Source: https://github.com/Infineon/freertos/blob/master/Source/portable/MemMang/heap_2.c
 
 #define NULL ((void *) 0)
-#define BYTE_ALIGNMENT 8
-#define BYTE_ALIGNMENT_MASK 0x07
 
 typedef unsigned int size_t;
 typedef unsigned char uint8_t;
