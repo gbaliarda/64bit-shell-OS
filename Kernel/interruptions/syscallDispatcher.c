@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "syscalls.h"
 #include "../include/mm.h"
+#include "../include/scheduler.h"
 
 static int sysNum;
 
@@ -33,6 +34,9 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2) {
         return 1;
     case 16:
         memStatus((uint32_t *) arg0);
+        return 1;
+    case 17:
+        createProcess((uint64_t) arg0, (uint32_t) arg1, (uint8_t) arg2);
         return 1;
 
     default:

@@ -2,6 +2,13 @@
 
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue);
 
+void printHolaProcess() {
+	while(1) {
+		for (int i = 0; i < 10000000; i++);
+		printf("hola\n");
+	}
+}
+
 void executeCommand(char * buffer) {
 	int index = 0;
 	char command[21];
@@ -133,7 +140,10 @@ void executeCommand(char * buffer) {
 		cpuInformation cpuidData;
 		int maxEaxValue = cpuid(&cpuidData);
 		printProcessorInfo(&cpuidData, maxEaxValue);
-	} 
+	}
+	else if (compareStrings(command, "holaprocess")) {
+		sys_createProcess((uint64_t)&printHolaProcess, 400, 1);
+	}
 	else
 		printf("Command not found, try 'help'\n");
 	

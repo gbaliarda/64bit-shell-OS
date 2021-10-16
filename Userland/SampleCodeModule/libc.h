@@ -109,3 +109,11 @@ void getCpuExtendedFeatures(cpuidRegisters *cpuidRegister);
 int cpuidAvailability();
 
 int getCpuLeaf();
+
+void *sys_alloc(unsigned int memoryToAllocate);
+
+void sys_free(void *memoryToFree);
+
+void sys_memStatus(unsigned int *status);
+
+void sys_createProcess(uint64_t ip, uint32_t size, uint8_t priority);
