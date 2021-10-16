@@ -84,6 +84,7 @@ SECTION .text
 	jne .end
 
 .timerTick:
+	mov rdi, rsp ; pasa el rsp para actualizar el PCB del proceso actual y poder retomar luego
 	call switchProcess
 	mov rsp, rax
 

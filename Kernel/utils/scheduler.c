@@ -19,41 +19,27 @@ typedef struct Scheduler {
 } Scheduler;
 
 Scheduler *scheduler;
+uint8_t firstProcess;
 
 void initScheduler() {
   scheduler = (Scheduler *) alloc(sizeof(Scheduler));
   scheduler->index = 0;
   scheduler->currentProcess = 0;
+  firstProcess = 1;
 }
 
 void loadProcess(uint64_t pcb) {
   scheduler->readyList[scheduler->index++] = (pcb_t *) (pcb - sizeof(pcb_t));
-  ncPrint("PCB: ");
-  ncPrintHex(pcb);
-  ncNewline();
-  ncPrint("SS: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->stackSegment);
-  ncNewline();
-  ncPrint("SP: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->sp);
-  ncNewline();
-  ncPrint("RFLAGS: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->rflags);
-  ncNewline();
-  ncPrint("CS: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->codeSegment);
-  ncNewline();
-  ncPrint("IP: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->ip);
-  ncNewline();
-  ncPrint("ARGC: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->argc);
-  ncNewline();
-  ncPrint("ARGV: ");
-  ncPrintHex(scheduler->readyList[scheduler->currentProcess]->argv);
-  ncNewline();
 }
 
-uint64_t switchProcess() {
+uint64_t switchProcess(uint64_t sp) {
+  // Para el primer proceso no actualizamos el sp, usamos el hardcodeado
+  if (firstProcess)
+    firstProcess = 0;
+  else
+    // guardar el sp del proceso actual en su PCB
+    scheduler->readyList[scheduler->currentProcess]->sp = sp;
+  ncPrint("Switching!\n");
+  // retornar el sp del proximo proceso a ejecutarse
   return scheduler->readyList[scheduler->currentProcess]->sp;
 }

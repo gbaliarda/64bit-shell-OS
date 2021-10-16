@@ -33,10 +33,10 @@ initFirstProcess:
 	mov rax, rsp
 	
 	mov rsp, rdi
-	sub rdi, 160 ; 8 ?
+	sub rdi, 160 ; deja el rsp al final del "stackframe de int", para que luego se haga popstate + iretq y se popee en el orden correcto
 	mov rbp, rdi
-	; 
-	push qword 0x0 ; first + 1016
+
+	push qword 0x0
 	push qword rbp
 	push qword 0x202
 	push qword 0x8

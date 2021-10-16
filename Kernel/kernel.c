@@ -70,31 +70,18 @@ int main() {
 	ncNewline();
 	ncNewline();
 
-	ncPrint("Loading IDT...");
-	ncNewline();
-	load_idt();
-
-	ncPrint("Loading Shell...");
-	wait(1);
-	ncNewline();
-	ncClear();
-
 	initMemManager(memoryManagerAddress, heapModuleAddress);
 
 	// Creamos el primer proceso a mano
 	uint64_t firstProcess = (uint64_t) alloc(1024);
 	initFirstProcess(firstProcess + 1024);
-	// ncPrint("SP esperado: ");
-	/*
-		600410 -> 
-		600408 -> 0x0
-		600400 -> 0x600410
-	*/
-	// ncPrintHex(firstProcess + 1016);
-	// ncNewline();
 
 	initScheduler();
 	loadProcess(firstProcess + 1024);
+
+	ncClear();
+
+	load_idt();
 
 	// runShell();
 

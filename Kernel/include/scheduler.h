@@ -7,6 +7,6 @@ void initScheduler();
 
 void loadProcess(uint64_t pcb);
 
-uint64_t switchProcess();
+uint64_t switchProcess(uint64_t sp);
 
 #endif
