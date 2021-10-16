@@ -8,6 +8,6 @@ void * memcpy(void * destination, const void * source, uint64_t length);
 
 char *cpuVendor(char *result);
 
-void initFirstProcess(uint64_t stackBase);
+uint64_t initProcess(uint64_t stackBase, uint64_t ip);
 
 #endif

@@ -86,6 +86,8 @@ SECTION .text
 .timerTick:
 	mov rdi, rsp ; pasa el rsp para actualizar el PCB del proceso actual y poder retomar luego
 	call switchProcess
+	cmp rax, 0
+	je .end
 	mov rsp, rax
 
 .end:

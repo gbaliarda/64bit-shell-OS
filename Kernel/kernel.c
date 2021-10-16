@@ -73,11 +73,8 @@ int main() {
 	initMemManager(memoryManagerAddress, heapModuleAddress);
 
 	// Creamos el primer proceso a mano
-	uint64_t firstProcess = (uint64_t) alloc(1024);
-	initFirstProcess(firstProcess + 1024);
-
 	initScheduler();
-	loadProcess(firstProcess + 1024);
+	createProcess((uint64_t)sampleCodeModuleAddress, 1024, 1);
 
 	ncClear();
 
