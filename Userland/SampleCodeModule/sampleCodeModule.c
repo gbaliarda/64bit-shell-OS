@@ -2,32 +2,13 @@
 
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue);
 
-void printHolaProcess() {
-	while(1) {
+void p1() {
+	for(int z = 0; z < 5; z++) {
+		for (int j = 0; j < 10000000; j++);
 		for (int i = 0; i < 10000000; i++);
-		printf("1");
+			printf("1");
 	}
-}
-
-void printHolaProcess2() {
-	while(1) {
-		for (int i = 0; i < 10000000; i++);
-		printf("2");
-	}
-}
-
-void printHolaProcess3() {
-	while(1) {
-		for (int i = 0; i < 10000000; i++);
-		printf("3");
-	}
-}
-
-void printHolaProcess4() {
-	while(1) {
-		for (int i = 0; i < 10000000; i++);
-		printf("4");
-	}
+	sys_exit();
 }
 
 void executeCommand(char * buffer) {
@@ -163,24 +144,12 @@ void executeCommand(char * buffer) {
 		printProcessorInfo(&cpuidData, maxEaxValue);
 	}
 	else if (compareStrings(command, "p1")) {
-		sys_createProcess((uint64_t)&printHolaProcess, 500, 2);
-	}
-	else if(compareStrings(command, "p2")) {
-		sys_createProcess((uint64_t)&printHolaProcess2, 500, 2);
-	}
-	else if(compareStrings(command, "p3")) {
-		sys_createProcess((uint64_t)&printHolaProcess3, 500, 3);
-	}
-	else if(compareStrings(command, "p4")) {
-		sys_createProcess((uint64_t)&printHolaProcess4, 500, 4);
+		sys_createProcess((uint64_t)&p1, 500, 1);
 	}
 	else
 		printf("Command not found, try 'help'\n");
 	
 }
-// 34 2
-// 18 3
-// 11 4
 
 int main() {
 

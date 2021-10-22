@@ -47,4 +47,6 @@ void clearScreen();
 
 char consoleInUse();
 
+void exit();
+
 #endif

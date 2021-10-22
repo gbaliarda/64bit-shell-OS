@@ -1,6 +1,8 @@
 GLOBAL cpuVendor
 GLOBAL initProcess
 
+GLOBAL runScheduler
+
 section .text
 	
 cpuVendor:
@@ -64,3 +66,7 @@ initProcess:
 	pop rsp
 	pop rbp
 	ret
+
+runScheduler:	
+	sti
+	int 20h

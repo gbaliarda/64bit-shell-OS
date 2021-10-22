@@ -5,6 +5,7 @@ GLOBAL sys_printmem
 GLOBAL sys_getDateTime
 GLOBAL sys_clearScreen
 GLOBAL sys_createProcess
+GLOBAL sys_exit
 
 section .text
 
@@ -51,7 +52,13 @@ sys_memStatus:
   mov rax, 16
   int 80h
   ret
+
 sys_createProcess:
   mov rax, 17
+  int 80h
+  ret
+
+sys_exit:
+  mov rax, 18
   int 80h
   ret

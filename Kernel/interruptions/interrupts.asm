@@ -64,8 +64,8 @@ SECTION .text
 %endmacro
 
 %macro irqHandlerMaster 1
-	pushState
 	cli
+	pushState
 	
 	mov rax, %1
 	cmp rax, 1
@@ -76,6 +76,7 @@ SECTION .text
 	mov rdi, %1
 	call irqDispatcher
 
+	; signal pic EOI (End of Interrupt)
 	mov al, 20h
 	out 20h, al
 
@@ -91,8 +92,8 @@ SECTION .text
 	mov rsp, rax
 
 .end:
-	sti
 	popState
+	sti
 	iretq
 %endmacro
 

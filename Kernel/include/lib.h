@@ -10,4 +10,6 @@ char *cpuVendor(char *result);
 
 uint64_t initProcess(uint64_t stackBase, uint64_t ip);
 
+void runScheduler();
+
 #endif

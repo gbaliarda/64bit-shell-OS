@@ -3,6 +3,8 @@
 #include "interrupts.h"
 #include "syscalls.h"
 #include "time.h"
+#include "../include/scheduler.h"
+#include "../include/lib.h"
 
 int mayus = 0;
 Registers b, bAux;
@@ -119,4 +121,9 @@ void getDateTime(Time *dayTime) {
 
 void clearScreen() {
   ncClear();
+}
+
+void exit() {
+  exitCurrentProcess();
+  runScheduler();
 }

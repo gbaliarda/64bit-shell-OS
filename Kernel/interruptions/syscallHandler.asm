@@ -39,6 +39,7 @@ SECTION .text
 %endmacro
 
 syscallHandler:
+	cli
 	pushState
   push rdi
   mov rdi, rax
@@ -46,4 +47,5 @@ syscallHandler:
   pop rdi
   call syscallDispatcher
 	popState
+	sti
 	iretq 

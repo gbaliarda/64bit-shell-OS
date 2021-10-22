@@ -38,6 +38,9 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2) {
     case 17:
         createProcess((uint64_t) arg0, (uint32_t) arg1, (uint8_t) arg2);
         return 1;
+    case 18:
+        exit();
+        return 1;
 
     default:
       return -1;
