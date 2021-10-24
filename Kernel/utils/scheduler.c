@@ -82,7 +82,8 @@ void initScheduler() {
   aux->next = waitingKeyboardList->current;
 
   uint64_t dummyMemory = (uint64_t) alloc(500);
-	uint64_t sp = initProcess(dummyMemory + 500, (uint64_t)&dummyProcess);
+  
+	uint64_t sp = initProcess(dummyMemory + 500, (uint64_t)&dummyProcess, 0, NULL);
   dummy = (ListNode *) alloc(sizeof(ListNode));
   dummy->process.pid = 0;
   dummy->process.sp = sp;
@@ -93,7 +94,7 @@ void initScheduler() {
   dummy->next = scheduler->start;
 }
 
-static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory) {
+static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char *name) {
 
   if (node == NULL) {
     ListNode *newNode = (ListNode *) ((uint64_t)scheduler + sizeof(Scheduler));
@@ -102,12 +103,15 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
     newNode->process.priority = priority;
     newNode->process.auxPriority = priority;
     newNode->process.sp = sp;
+    newNode->process.bp = sp;
     newNode->process.processMemory = processMemory;
+    newNode->process.type = 1;
+    newNode->process.name = name;
     return newNode;
   }
 
   if (node->next != NULL && priority >= node->next->process.priority) {
-    node->next = loadProcess(node->next, pid, priority, sp, processMemory);
+    node->next = loadProcess(node->next, pid, priority, sp, processMemory, name);
     return node;
   }
 
@@ -121,14 +125,17 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   newNode->process.priority = priority;
   newNode->process.auxPriority = priority;
   newNode->process.sp = sp;
+  newNode->process.bp = sp;
   newNode->process.processMemory = processMemory;
+  newNode->process.type = 1;
+  newNode->process.name = name;
   return node;
 }
 
-void createProcess(uint64_t ip, uint32_t size, uint8_t priority) {
+void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv) {
   uint64_t processMemory = (uint64_t) alloc(size);
-	uint64_t sp = initProcess(processMemory + size, ip);
-  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory);
+	uint64_t sp = initProcess(processMemory + size, ip, argc, argv);
+  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv[0]);
 }
 
 uint64_t switchProcess(uint64_t sp) {
@@ -228,7 +235,7 @@ void printProcessList() {
   ncPrint("Nombre    PID    Prioridad     SP       BP     Tipo        Estado\n");
   ListNode *aux = scheduler->start;
   while(aux != NULL) {
-    ncPrint("nombre");
+    ncPrint(aux->process.name);
     ncPrint("     ");
     ncPrintDec(aux->process.pid);
     ncPrint("     ");
@@ -236,9 +243,9 @@ void printProcessList() {
     ncPrint("            ");
     ncPrintHex(aux->process.sp);
     ncPrint("     ");
-    ncPrint("bp");
+    ncPrintHex(aux->process.bp);
     ncPrint("     ");
-    ncPrint("foreground");
+    ncPrint(aux->process.type == 1 ? "foreground" : "background");
     ncPrint("     ");
     ncPrint(aux->process.pstate ? "Ready" : "Bloqueado");
     ncNewline();

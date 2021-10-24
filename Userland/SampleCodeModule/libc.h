@@ -116,7 +116,7 @@ void sys_free(void *memoryToFree);
 
 void sys_memStatus(unsigned int *status);
 
-void sys_createProcess(uint64_t ip, uint32_t size, uint8_t priority);
+void sys_createProcess(uint64_t ip, uint32_t size, uint8_t priority, unsigned int argc, char **argv);
 
 void sys_exit();
 

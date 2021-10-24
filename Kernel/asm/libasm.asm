@@ -45,13 +45,13 @@ initProcess:
 	push qword 0x8   ; cs
 	push qword rsi   ; rip
 	; registros generales
-	push qword 0x0 ; argc
-	push qword 0x0 ; argv
 	push qword 0x1
 	push qword 0x2
 	push qword 0x3
 	push qword 0x4
 	push qword 0x5
+	push qword rdx ; argc
+	push qword rcx ; argv
 	push qword 0x6
 	push qword 0x7
 	push qword 0x8
