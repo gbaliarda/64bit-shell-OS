@@ -4,6 +4,8 @@
     "interrupts.h": "c",
     "mm.h": "c",
     "lib.h": "c",
-    "syscalls.h": "c"
+    "syscalls.h": "c",
+    "scheduler.h": "c",
+    "idtloader.h": "c"
   }
 }

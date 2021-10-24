@@ -119,3 +119,11 @@ void sys_memStatus(unsigned int *status);
 void sys_createProcess(uint64_t ip, uint32_t size, uint8_t priority);
 
 void sys_exit();
+
+void sys_printProcess();
+
+void sys_killProcess(uint32_t pid);
+
+void sys_changePriority(uint32_t pid, uint8_t newPriority);
+
+void sys_changeState(uint32_t pid);

@@ -71,7 +71,6 @@ SECTION .text
 	cmp rax, 1
 	jne .continue
 	call saveBackup
-
 .continue:
 	mov rdi, %1
 	call irqDispatcher

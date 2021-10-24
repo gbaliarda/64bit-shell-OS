@@ -41,6 +41,18 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2) {
     case 18:
         exit();
         return 1;
+    case 19:
+        printProcess();
+        return 1;
+    case 20:
+        killProcess((uint32_t) arg0);
+        return 1;
+    case 21:
+        changePriority((uint32_t) arg0, (uint8_t) arg1);
+        return 1;
+    case 22:
+        changeState((uint32_t) arg0);
+        return 1;
 
     default:
       return -1;

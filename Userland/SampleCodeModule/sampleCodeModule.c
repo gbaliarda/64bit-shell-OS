@@ -3,12 +3,19 @@
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue);
 
 void p1() {
-	for(int z = 0; z < 5; z++) {
+	for(int z = 0; z < 10; z++) {
 		for (int j = 0; j < 10000000; j++);
 		for (int i = 0; i < 10000000; i++);
 			printf("1");
 	}
 	sys_exit();
+}
+
+void loop(int segundos) {
+	while(1) {
+		for(int i = 0; i < 10000000*segundos; i++)
+		printf("Hola!");
+	}
 }
 
 void executeCommand(char * buffer) {
@@ -22,7 +29,7 @@ void executeCommand(char * buffer) {
 	}
 
 	if (index == 20 && buffer[index] != ' ') {
-		printf("Command not found\n");
+		printf("Command not found, try 'help'\n");
 		return;
 	}
 
@@ -143,18 +150,31 @@ void executeCommand(char * buffer) {
 		int maxEaxValue = cpuid(&cpuidData);
 		printProcessorInfo(&cpuidData, maxEaxValue);
 	}
-	else if (compareStrings(command, "p1")) {
-		sys_createProcess((uint64_t)&p1, 500, 1);
+	else if (compareStrings(command, "p1"))
+		sys_createProcess((uint64_t)&p1, 500, 10);
+	else if(compareStrings(command, "loop")) {
+		sys_createProcess((uint64_t)&loop, 500, 1);
+	} else if(compareStrings(command, "ps")) {
+		sys_printProcess();
+	} else if(compareStrings(command, "kill")) {
+		int ok = 1;
+		sys_killProcess((uint32_t) atoi(args[0], &ok));
+	} else if(compareStrings(command, "nice")) {
+		int ok = 1;
+		sys_changePriority((uint32_t) atoi(args[0], &ok), (uint8_t) atoi(args[1], &ok));
+	} else if(compareStrings(command, "block")) {
+		int ok = 1;
+		sys_changeState((uint32_t) atoi(args[0], &ok));
 	}
 	else
 		printf("Command not found, try 'help'\n");
-	
+
 }
 
 int main() {
 
 	char buffer[101];
-	
+
 	while (1) {
 		printf("> ");
 		scanf(buffer);

@@ -6,6 +6,10 @@ GLOBAL sys_getDateTime
 GLOBAL sys_clearScreen
 GLOBAL sys_createProcess
 GLOBAL sys_exit
+GLOBAL sys_printProcess
+GLOBAL sys_killProcess
+GLOBAL sys_changePriority
+GLOBAL sys_changeState
 
 section .text
 
@@ -60,5 +64,25 @@ sys_createProcess:
 
 sys_exit:
   mov rax, 18
+  int 80h
+  ret
+
+sys_printProcess:
+  mov rax, 19
+  int 80h
+  ret
+
+sys_killProcess:
+  mov rax, 20
+  int 80h
+  ret
+
+sys_changePriority:
+  mov rax, 21
+  int 80h
+  ret
+
+sys_changeState:
+  mov rax, 22
   int 80h
   ret

@@ -28,9 +28,8 @@ int64_t write(uint64_t fd, const char* buf, uint64_t count) {
 int read(char* buf, int limit) {
   int count = 0;
 
-  while (count < limit || limit == -1)
-  {
-		_hlt();
+  while (count < limit || limit == -1) {
+    waitForKeyboard();
     if (ticks_elapsed() % 9 == 0)
       displayCursor();
 		unsigned char key = getInput();
@@ -126,4 +125,20 @@ void clearScreen() {
 void exit() {
   exitCurrentProcess();
   runScheduler();
+}
+
+void printProcess() {
+  printProcessList();
+}
+
+void killProcess(uint32_t pid) {
+  killPid(pid);
+}
+
+void changePriority(uint32_t pid, uint8_t newPriority) {
+  changeProcessPriority(pid, newPriority);
+}
+
+void changeState(uint32_t pid) {
+  changeProcessState(pid);
 }

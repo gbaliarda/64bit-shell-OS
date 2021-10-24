@@ -11,4 +11,16 @@ void createProcess(uint64_t ip, uint32_t size, uint8_t priority);
 
 void exitCurrentProcess();
 
+void printProcessList();
+
+void killPid(uint32_t pid);
+
+void changeProcessPriority(uint32_t pid, uint8_t newPriority);
+
+void changeProcessState(uint32_t pid);
+
+void waitForKeyboard();
+
+void awakeKeyboardQueue();
+
 #endif

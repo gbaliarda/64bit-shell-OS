@@ -74,7 +74,7 @@ int main() {
 
 	// Creamos el primer proceso a mano
 	initScheduler();
-	createProcess((uint64_t)sampleCodeModuleAddress, 1024, 1);
+	createProcess((uint64_t)sampleCodeModuleAddress, 2048, 1);
 
 	ncClear();
 
