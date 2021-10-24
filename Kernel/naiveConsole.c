@@ -63,8 +63,32 @@ void ncNewline() {
 	while((uint64_t)(currentVideo - video) % (width * 2) != 0);
 }
 
-void ncPrintDec(uint64_t value) {
-	ncPrintBase(value, 10);
+int itos(int value, char* target, int initialIndex){
+    int digit; 
+    int sign = 1; 
+    int i = -1, j = initialIndex;
+    char aux[11];
+    if(value < 0){
+        sign = 0;
+        value *= -1;
+    }
+    do {
+      i++;
+      digit = value % 10;
+      aux[i] = digit + '0'; // 48 = '0' 
+      value /= 10; 
+    } while(value > 0);
+    if (!sign)
+      target[j++] = '-';
+    while(i > -1)
+      target[j++] = aux[i--];
+    target[j] = 0;
+    return j;
+}
+
+void ncPrintDec(int64_t value) {
+	itos(value, buffer, 0);
+	ncPrint(buffer);
 }
 
 void ncPrintHex(uint64_t value) {

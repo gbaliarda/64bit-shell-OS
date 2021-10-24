@@ -1,25 +1,11 @@
 #include "../include/scheduler.h"
 #include "../include/naiveConsole.h"
-#include "../include/mm.h"
-#include "../include/lib.h"
 #include "../interruptions/interrupts.h"
 
 #define QUANTUM 1
 #define PRIORITY_QUANTUM 5
-#define MAX_PROCESS_AMOUNT 10
+#define MAX_WAITING_KEYBOARD 10
 #define NULL ((void*) 0)
-
-typedef struct pcb {
-  char *name;
-  uint8_t type;
-  uint32_t pid;
-  uint8_t pstate;
-  uint8_t priority;
-  uint8_t auxPriority;
-  uint64_t sp;
-  uint64_t bp;
-  uint64_t processMemory;
-} pcb;
 
 typedef struct ListNode {
   pcb process;
@@ -57,7 +43,7 @@ static void dummyProcess() {
 }
 
 void initScheduler() {
-  scheduler = (Scheduler *) alloc(sizeof(Scheduler) + sizeof(ListNode)* MAX_PROCESS_AMOUNT);
+  scheduler = (Scheduler *) alloc(sizeof(Scheduler));
   scheduler->currentProcess = NULL;
   scheduler->quantum = QUANTUM-1;
   scheduler->priorityQuantum = PRIORITY_QUANTUM;
@@ -72,7 +58,7 @@ void initScheduler() {
   waitingKeyboardList->tail = waitingKeyboardList->current;
   waitingKeyboardList->size = 0;
   WaitingNode *aux = waitingKeyboardList->current;
-  for (int i = 0; i < MAX_PROCESS_AMOUNT; i++) {
+  for (int i = 0; i < MAX_WAITING_KEYBOARD; i++) {
     WaitingNode *newNode = (WaitingNode *) alloc(sizeof(WaitingNode));
     newNode->process = NULL;
     newNode->next = NULL;
@@ -97,7 +83,7 @@ void initScheduler() {
 static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char *name) {
 
   if (node == NULL) {
-    ListNode *newNode = (ListNode *) ((uint64_t)scheduler + sizeof(Scheduler));
+    ListNode *newNode = (ListNode *) alloc(sizeof(ListNode));
     newNode->process.pid = pid;
     newNode->process.pstate = 1;
     newNode->process.priority = priority;
@@ -115,7 +101,7 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
     return node;
   }
 
-  ListNode *newNode = (ListNode *) ((uint64_t)node + sizeof(ListNode));
+  ListNode *newNode = (ListNode *) alloc(sizeof(ListNode));
 
   newNode->next = node->next;
   node->next = newNode;
@@ -215,8 +201,11 @@ static ListNode * deleteProcess(ListNode *node, uint32_t pid) {
 
   if (node->process.pid == pid) {
     node->process.pstate = 2;
+    ListNode *aux = node->next;
+    deleteProcessFromSemaphores(pid);
     free((void *)node->process.processMemory);
-    return node->next;
+    free((void *)node);
+    return aux;
   }
 
   node->next = deleteProcess(node->next, pid);
@@ -232,10 +221,10 @@ void killPid(uint32_t pid) {
 }
 
 void printProcessList() {
-  ncPrint("Nombre    PID    Prioridad     SP       BP     Tipo        Estado\n");
+  ncPrint("Name    PID    Priority     SP       BP     Type        State\n");
   ListNode *aux = scheduler->start;
   while(aux != NULL) {
-    ncPrint(aux->process.name);
+    // ncPrint(aux->process.name);
     ncPrint("     ");
     ncPrintDec(aux->process.pid);
     ncPrint("     ");
@@ -247,21 +236,21 @@ void printProcessList() {
     ncPrint("     ");
     ncPrint(aux->process.type == 1 ? "foreground" : "background");
     ncPrint("     ");
-    ncPrint(aux->process.pstate ? "Ready" : "Bloqueado");
+    ncPrint(aux->process.pstate ? "Ready" : "Blocked");
     ncNewline();
     aux = aux->next;
   }
 }
 
-static pcb *getPCB(ListNode *node, uint32_t pid) {
-  if(node == NULL)
-    return NULL;
+// static pcb *getPCB(ListNode *node, uint32_t pid) {
+//   if(node == NULL)
+//     return NULL;
 
-  if(node->process.pid == pid)
-    return &node->process;
+//   if(node->process.pid == pid)
+//     return &node->process;
 
-  return getPCB(node->next, pid);
-}  
+//   return getPCB(node->next, pid);
+// }  
 
 void changeProcessPriority(uint32_t pid, uint8_t newPriority) {
   // pcb *pidPCB = getPCB(scheduler->start, pid);
@@ -278,7 +267,6 @@ void waitForKeyboard() {
   waitingKeyboardList->tail->process = &scheduler->currentProcess->process;
   waitingKeyboardList->tail = waitingKeyboardList->tail->next;
   waitingKeyboardList->size++;
-  _sti();
   runScheduler();
 }
 
@@ -287,5 +275,11 @@ void awakeKeyboardQueue() {
     return;
   waitingKeyboardList->size--;
   waitingKeyboardList->current->process->pstate = 1;
+  waitingKeyboardList->current->process->auxPriority = 1;
   waitingKeyboardList->current = waitingKeyboardList->current->next;
+}
+
+pcb *blockCurrentProcess() {
+  scheduler->currentProcess->process.pstate = 0;
+  return &scheduler->currentProcess->process;
 }

@@ -19,6 +19,26 @@ void p1(int argc, char **argv) {
 	sys_exit();
 }
 
+void p2() {
+	Semaphore *sem = sys_semOpen(1, 0);
+	printf("Soy p2 y hora de esperar!\n");
+	sys_semWait(sem);
+	printf("Soy p2 y me canse de esperar >:(\n");
+	sys_exit();
+}
+
+void p3() {
+	Semaphore *sem = sys_semOpen(1, 0);
+	printf("Voy a despertar a p2!\n");
+	sys_semPost(sem);
+	printf("Desperte a p2! :D\n");
+	sys_exit();
+}
+ 
+void p4() {
+	Semaphore *sem = sys_semOpen(1, 0);
+}
+
 void loop(int segundos) {
 	while(1) {
 		for(int i = 0; i < 10000000*segundos; i++)
@@ -166,14 +186,19 @@ void executeCommand(char * buffer) {
 		sys_printProcess();
 	} else if(compareStrings(args[0], "kill")) {
 		int ok = 1;
-		sys_killProcess((uint32_t) atoi(args[0], &ok));
+		sys_killProcess((uint32_t) atoi(args[1], &ok));
 	} else if(compareStrings(args[0], "nice")) {
 		int ok = 1;
-		sys_changePriority((uint32_t) atoi(args[0], &ok), (uint8_t) atoi(args[1], &ok));
+		sys_changePriority((uint32_t) atoi(args[1], &ok), (uint8_t) atoi(args[1], &ok));
 	} else if(compareStrings(args[0], "block")) {
 		int ok = 1;
-		sys_changeState((uint32_t) atoi(args[0], &ok));
-	}
+		sys_changeState((uint32_t) atoi(args[1], &ok));
+	} else if(compareStrings(args[0], "p2"))
+		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, (char **)args);
+	else if(compareStrings(args[0], "p3"))
+		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
+	else if(compareStrings(args[0], "psem"))
+		sys_printSemaphores();
 	else
 		printf("Command not found, try 'help'\n");
 

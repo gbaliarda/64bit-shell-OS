@@ -60,6 +60,12 @@ typedef struct cpuInformation {
   unsigned char avx2;
 } cpuInformation;
 
+
+typedef struct Semaphore {
+  uint32_t id;
+  int value;
+} Semaphore;
+
 void sys_write(unsigned int fd, const char *buffer, unsigned int count);
 
 int sys_read(char *buffer, int limit);
@@ -127,3 +133,13 @@ void sys_killProcess(uint32_t pid);
 void sys_changePriority(uint32_t pid, uint8_t newPriority);
 
 void sys_changeState(uint32_t pid);
+
+Semaphore *sys_semOpen(uint32_t id, int value);
+
+int sys_semClose(Semaphore *sem);
+
+int sys_semWait(Semaphore *sem);
+
+int sys_semPost(Semaphore *sem);
+
+void sys_printSemaphores();

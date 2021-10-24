@@ -1,7 +1,21 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include <stdint.h>
+#include "../include/lib.h"
+#include "../include/mm.h"
+#include "../include/semaphore.h"
+
+typedef struct pcb {
+  char *name;
+  uint8_t type;
+  uint32_t pid;
+  uint8_t pstate;
+  uint8_t priority;
+  uint8_t auxPriority;
+  uint64_t sp;
+  uint64_t bp;
+  uint64_t processMemory;
+} pcb;
 
 void initScheduler();
 
@@ -22,5 +36,7 @@ void changeProcessState(uint32_t pid);
 void waitForKeyboard();
 
 void awakeKeyboardQueue();
+
+pcb *blockCurrentProcess();
 
 #endif

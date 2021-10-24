@@ -2,6 +2,7 @@
 #include "syscalls.h"
 #include "../include/mm.h"
 #include "../include/scheduler.h"
+#include "../include/semaphore.h"
 
 static int sysNum;
 
@@ -52,6 +53,17 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
         return 1;
     case 22:
         changeState((uint32_t) arg0);
+        return 1;
+    case 23:
+        return (int64_t) sem_open((uint32_t) arg0, (int) arg1);
+    case 24:
+        return sem_close((semaphorePointer) arg0);
+    case 25:
+        return sem_wait((semaphorePointer) arg0);
+    case 26:
+        return sem_post((semaphorePointer) arg0);
+    case 27:
+        printSemaphores();
         return 1;
 
     default:

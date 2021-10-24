@@ -10,6 +10,11 @@ GLOBAL sys_printProcess
 GLOBAL sys_killProcess
 GLOBAL sys_changePriority
 GLOBAL sys_changeState
+GLOBAL sys_semOpen
+GLOBAL sys_semClose
+GLOBAL sys_semWait
+GLOBAL sys_semPost
+GLOBAL sys_printSemaphores
 
 section .text
 
@@ -84,5 +89,30 @@ sys_changePriority:
 
 sys_changeState:
   mov rax, 22
+  int 80h
+  ret
+
+sys_semOpen:
+  mov rax, 23
+  int 80h
+  ret
+
+sys_semClose:
+  mov rax, 24
+  int 80h
+  ret
+
+sys_semWait:
+  mov rax, 25
+  int 80h
+  ret
+  
+sys_semPost:
+  mov rax, 26
+  int 80h
+  ret
+
+sys_printSemaphores:
+  mov rax, 27
   int 80h
   ret

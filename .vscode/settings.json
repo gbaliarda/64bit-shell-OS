@@ -6,6 +6,8 @@
     "lib.h": "c",
     "syscalls.h": "c",
     "scheduler.h": "c",
-    "idtloader.h": "c"
+    "idtloader.h": "c",
+    "stdint.h": "c",
+    "stdint-gcc.h": "c"
   }
 }
