@@ -15,6 +15,13 @@ GLOBAL sys_semClose
 GLOBAL sys_semWait
 GLOBAL sys_semPost
 GLOBAL sys_printSemaphores
+GLOBAL sys_createPipe
+GLOBAL sys_createFdPipe
+GLOBAL sys_closeFdPipe
+GLOBAL sys_pipeWrite
+GLOBAL sys_pipeRead
+GLOBAL sys_openPipeId
+GLOBAL sys_printPipes
 
 section .text
 
@@ -114,5 +121,40 @@ sys_semPost:
 
 sys_printSemaphores:
   mov rax, 27
+  int 80h
+  ret
+
+sys_createPipe:
+  mov rax, 28
+  int 80h
+  ret
+
+sys_createFdPipe:
+  mov rax, 29
+  int 80h
+  ret
+
+sys_closeFdPipe:
+  mov rax, 30
+  int 80h
+  ret
+
+sys_pipeWrite:
+  mov rax, 31
+  int 80h
+  ret
+
+sys_pipeRead:
+  mov rax, 32
+  int 80h
+  ret
+
+sys_openPipeId:
+  mov rax, 33
+  int 80h
+  ret
+
+sys_printPipes:
+  mov rax, 34
   int 80h
   ret

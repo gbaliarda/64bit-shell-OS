@@ -66,6 +66,12 @@ typedef struct Semaphore {
   int value;
 } Semaphore;
 
+typedef struct fdPipe {
+  char readable;
+  char writable;
+  struct pipe *pipe;
+} fdPipe;
+
 void sys_write(unsigned int fd, const char *buffer, unsigned int count);
 
 int sys_read(char *buffer, int limit);
@@ -143,3 +149,17 @@ int sys_semWait(Semaphore *sem);
 int sys_semPost(Semaphore *sem);
 
 void sys_printSemaphores();
+
+int sys_createPipe(fdPipe *f0, fdPipe *f1);
+
+fdPipe *sys_createFdPipe();
+
+void sys_closeFdPipe(fdPipe *fd);
+
+int sys_pipeWrite(fdPipe *fd, char* string);
+
+int sys_pipeRead(fdPipe *fd, char* buffer);
+
+int sys_openPipeId(fdPipe *fd, uint32_t id, uint8_t reader);
+
+void sys_printPipes();

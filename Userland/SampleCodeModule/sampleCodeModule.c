@@ -20,24 +20,30 @@ void p1(int argc, char **argv) {
 }
 
 void p2() {
-	Semaphore *sem = sys_semOpen(1, 0);
-	printf("Soy p2 y hora de esperar!\n");
-	sys_semWait(sem);
-	printf("Soy p2 y me canse de esperar >:(\n");
+	fdPipe *fd = sys_createFdPipe();
+
+	sys_openPipeId(fd, 1, 0);
+
+	sys_pipeWrite(fd, "Hola");
+	sys_closeFdPipe(fd);
 	sys_exit();
 }
 
 void p3() {
-	Semaphore *sem = sys_semOpen(1, 0);
-	printf("Voy a despertar a p2!\n");
-	sys_semPost(sem);
-	printf("Desperte a p2! :D\n");
+	fdPipe *fd = sys_createFdPipe();
+
+	if (sys_openPipeId(fd, 1, 1) == -1)
+		sys_exit();
+
+	char buff[10];
+	sys_pipeRead(fd, buff);
+	sys_closeFdPipe(fd);
+
+	printf(buff);
+	printf("\n");
 	sys_exit();
 }
  
-void p4() {
-	Semaphore *sem = sys_semOpen(1, 0);
-}
 
 void loop(int segundos) {
 	while(1) {
@@ -199,22 +205,11 @@ void executeCommand(char * buffer) {
 		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
 	else if(compareStrings(args[0], "psem"))
 		sys_printSemaphores();
+	else if(compareStrings(args[0], "pipe"))
+		sys_printPipes();
 	else
 		printf("Command not found, try 'help'\n");
 
-}
-
-int main() {
-
-	char buffer[101];
-
-	while (1) {
-		printf("> ");
-		scanf(buffer);
-		executeCommand(buffer);
-	}
-									
-	return 0xDEADBEEF; 
 }
 
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
@@ -296,4 +291,19 @@ void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
 	cpuidData->avx2 ? printf("Yes") : printf("No");
 	putChar('\n');
 }
+
+int main() {
+
+	char buffer[101];
+
+	while (1) {
+		printf("> ");
+		scanf(buffer);
+		executeCommand(buffer);
+	}
+									
+	return 0xDEADBEEF; 
+}
+
+
 

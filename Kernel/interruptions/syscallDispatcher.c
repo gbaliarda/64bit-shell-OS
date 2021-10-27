@@ -3,6 +3,7 @@
 #include "../include/mm.h"
 #include "../include/scheduler.h"
 #include "../include/semaphore.h"
+#include "../include/pipes.h"
 
 static int sysNum;
 
@@ -65,7 +66,22 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
     case 27:
         printSemaphores();
         return 1;
-
+    case 28:
+        return createPipe((fdPipe *) arg0, (fdPipe *) arg1);
+    case 29:
+        return (int64_t) createFdPipe();
+    case 30:
+        closeFdPipe((fdPipe *) arg0);
+        return 1;
+    case 31:
+        return pipeWrite((fdPipe *) arg0, (char *) arg1);
+    case 32: 
+        return pipeRead((fdPipe *) arg0, (char *) arg2);
+    case 33: 
+        return openPipeId((fdPipe *) arg0, (uint32_t) arg1, (uint8_t) arg2);
+    case 34:
+        printPipes();
+        return 1;
     default:
       return -1;
   }
