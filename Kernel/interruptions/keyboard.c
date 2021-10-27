@@ -1,4 +1,6 @@
 #include <keyboard.h>
+#include "../include/scheduler.h"
+#include "../include/naiveConsole.h"
 
 static const unsigned char ASCIITable[] = {
      0,   27,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\'', 0, 8,  
@@ -15,9 +17,11 @@ static const unsigned char ASCIITable[] = {
 static unsigned char actualKey;
 
 void keyboard_handler() {
-    unsigned char key = getKey();
-    if (key < 183)
-      actualKey = ASCIITable[key];
+  unsigned char key = getKey();
+  if (key < 183) {
+    actualKey = ASCIITable[key];
+    awakeKeyboardQueue();
+  }
 }
 
 unsigned char getInput() {

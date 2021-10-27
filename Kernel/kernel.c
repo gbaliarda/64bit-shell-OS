@@ -4,6 +4,7 @@
 #include <moduleLoader.h>
 #include <naiveConsole.h>
 #include "./include/mm.h"
+#include "./include/scheduler.h"
 // Interrupts
 #include <keyboard.h>
 #include <interrupts.h>
@@ -69,22 +70,19 @@ int main() {
 	ncNewline();
 	ncNewline();
 
-	ncPrint("Loading IDT...");
-	ncNewline();
-	load_idt();
-
-	ncPrint("Loading Shell...");
-	wait(1);
-	ncNewline();
-	ncClear();
-
 	initMemManager(memoryManagerAddress, heapModuleAddress);
 
 	// Creamos el primer proceso a mano
-	uint64_t firstProcess = (uint64_t) alloc(1024);
-	initFirstProcess(firstProcess + 1024);
+	initScheduler();
+	char argv[1][10] = {"Shell"};
+	argv[0][5] = 0;
+	createProcess((uint64_t)sampleCodeModuleAddress, 2048, 1, 1, (char **) argv);
 
-	runShell();
+	ncClear();
+
+	load_idt();
+
+	// runShell();
 
 	return 0;
 }

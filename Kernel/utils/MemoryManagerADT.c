@@ -1,14 +1,13 @@
 #ifdef HEAP2
 
 #include "../include/memoryManagerADT.h"
+#include <stdint.h>
 
 // Source: https://github.com/Infineon/freertos/blob/master/Source/portable/MemMang/heap_2.c
 
 #define NULL ((void *) 0)
 
 typedef unsigned int size_t;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
 
 typedef struct MemoryBlock {
 	struct MemoryBlock *nextFreeBlock;

@@ -1,31 +1,80 @@
 #include "libc.h"
 
+#define MAX_ARG_AMT 5
+#define MAX_ARG_COMMAND_LEN 20
+
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue);
+
+void p1(int argc, char **argv) {
+	for(int z = 0; z < 1; z++) {
+		for (int j = 0; j < 10000000; j++);
+		for (int i = 0; i < 10000000; i++);
+			printf("Cantidad de argumentos: "); printInt(argc);
+			for (int i = 0; i < argc; i++) {
+				printf(argv[i]);
+				printf(" ");
+			}
+			printf("\n");
+	}
+	sys_exit();
+}
+
+void p2() {
+	fdPipe *fd = sys_createFdPipe();
+
+	sys_openPipeId(fd, 1, 0);
+
+	sys_pipeWrite(fd, "Hola");
+	sys_closeFdPipe(fd);
+	sys_exit();
+}
+
+void p3() {
+	fdPipe *fd = sys_createFdPipe();
+
+	if (sys_openPipeId(fd, 1, 1) == -1)
+		sys_exit();
+
+	char buff[10];
+	sys_pipeRead(fd, buff);
+	sys_closeFdPipe(fd);
+
+	printf(buff);
+	printf("\n");
+	sys_exit();
+}
+ 
+
+void loop(int segundos) {
+	while(1) {
+		for(int i = 0; i < 10000000*segundos; i++)
+		printf("Hola!");
+	}
+}
 
 void executeCommand(char * buffer) {
 	int index = 0;
-	char command[21];
-	char args[5][21];
+	char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1];
 
-	while (index < 20 && buffer[index] && buffer[index] != ' ') {
-		command[index] = buffer[index];
+	while (index < MAX_ARG_COMMAND_LEN && buffer[index] && buffer[index] != ' ') {
+		args[0][index] = buffer[index];
 		index++;
 	}
 
-	if (index == 20 && buffer[index] != ' ') {
-		printf("Command not found\n");
+	if (index == MAX_ARG_COMMAND_LEN && buffer[index] != ' ') {
+		printf("Command not found, try 'help'\n");
 		return;
 	}
 
-	command[index] = 0;
+	args[0][index] = 0;
 	while (buffer[index] && buffer[index] == ' ') 
 		index++;
 
-	int argNum = 0;	
-	while (argNum < 5 && buffer[index]) {
+	unsigned int argNum = 1;	
+	while (argNum < MAX_ARG_AMT+1 && buffer[index]) {
 		int indexArg = 0;
 
-		while (indexArg < 20 && buffer[index] && buffer[index] != ' '){
+		while (indexArg < MAX_ARG_COMMAND_LEN && buffer[index] && buffer[index] != ' '){
 			args[argNum][indexArg] = buffer[index];
 			indexArg++;
 			index++;
@@ -41,7 +90,8 @@ void executeCommand(char * buffer) {
 			index++;	
 	}
 
-	if (compareStrings(command, "help")) {
+
+	if (compareStrings(args[0], "help")) {
 		printf("-------COMMANDS------\n");
 		printf("1: help\n");
 		printf("2: inforeg\n");
@@ -53,7 +103,7 @@ void executeCommand(char * buffer) {
 		printf("8: computeZeros\n");
 		printf("9: cpuid\n");
 	} 
-	else if (compareStrings(command, "inforeg")) {
+	else if (compareStrings(args[0], "inforeg")) {
 		Registers registers;
 		sys_inforeg(&registers);
 		printReg("rax",registers.rax);
@@ -72,15 +122,15 @@ void executeCommand(char * buffer) {
 		printReg("r14",registers.r14);
 		printReg("r15",registers.r15);
 	}
-	else if (compareStrings(command, "printmem")) {
+	else if (compareStrings(args[0], "printmem")) {
 		int ok = 1;
-		uint64_t pointer = hex2int(args[0], &ok);
+		uint64_t pointer = hex2int(args[1], &ok);
 		if(ok)
 			sys_printmem(pointer);
 		else
 			printf("Invalid address\n");
 	} 
-	else if (compareStrings(command, "printDateTime")) {
+	else if (compareStrings(args[0], "printDateTime")) {
 		Time dateTime;
 		sys_getDateTime(&dateTime);
 		printInt(dateTime.day);
@@ -96,20 +146,20 @@ void executeCommand(char * buffer) {
 		printInt(dateTime.seconds);
 		putChar('\n');
 	} 
-	else if (compareStrings(command, "zeroException")) {
+	else if (compareStrings(args[0], "zeroException")) {
 		divZero();
 	}
-	else if (compareStrings(command, "opcodeException"))
+	else if (compareStrings(args[0], "opcodeException"))
 		throwInvalidOpcode();
-	else if (compareStrings(command, "clear"))
+	else if (compareStrings(args[0], "clear"))
 		sys_clearScreen();
-	else if (compareStrings(command, "computeZeros")) {
+	else if (compareStrings(args[0], "computeZeros")) {
 		char res[20];
 		int ok = 1;
 		double a, b, c;
-		a = strToDouble(args[0], &ok);
-		b = strToDouble(args[1], &ok);
-		c = strToDouble(args[2], &ok);
+		a = strToDouble(args[1], &ok);
+		b = strToDouble(args[2], &ok);
+		c = strToDouble(args[3], &ok);
 		if (!ok) {
 			printf("Invalid arguments a, b or c\n");
 			return;
@@ -129,27 +179,37 @@ void executeCommand(char * buffer) {
 		else
 			printf("Roots are not real numbers\n");
 	}
-	else if (compareStrings(command, "cpuid")) {
+	else if (compareStrings(args[0], "cpuid")) {
 		cpuInformation cpuidData;
 		int maxEaxValue = cpuid(&cpuidData);
 		printProcessorInfo(&cpuidData, maxEaxValue);
-	} 
+	}
+	else if (compareStrings(args[0], "p1"))
+		sys_createProcess((uint64_t)&p1, 1024, 10, argNum, (char **)args);
+	else if(compareStrings(args[0], "loop")) {
+		sys_createProcess((uint64_t)&loop, 1024, 1, argNum, (char **)args);
+	} else if(compareStrings(args[0], "ps")) {
+		sys_printProcess();
+	} else if(compareStrings(args[0], "kill")) {
+		int ok = 1;
+		sys_killProcess((uint32_t) atoi(args[1], &ok));
+	} else if(compareStrings(args[0], "nice")) {
+		int ok = 1;
+		sys_changePriority((uint32_t) atoi(args[1], &ok), (uint8_t) atoi(args[1], &ok));
+	} else if(compareStrings(args[0], "block")) {
+		int ok = 1;
+		sys_changeState((uint32_t) atoi(args[1], &ok));
+	} else if(compareStrings(args[0], "p2"))
+		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, (char **)args);
+	else if(compareStrings(args[0], "p3"))
+		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
+	else if(compareStrings(args[0], "psem"))
+		sys_printSemaphores();
+	else if(compareStrings(args[0], "pipe"))
+		sys_printPipes();
 	else
 		printf("Command not found, try 'help'\n");
-	
-}
 
-int main() {
-
-	char buffer[101];
-
-	while (1) {
-		printf("> ");
-		scanf(buffer);
-		executeCommand(buffer);
-	}
-									
-	return 0xDEADBEEF; 
 }
 
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
@@ -231,4 +291,19 @@ void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
 	cpuidData->avx2 ? printf("Yes") : printf("No");
 	putChar('\n');
 }
+
+int main() {
+
+	char buffer[101];
+
+	while (1) {
+		printf("> ");
+		scanf(buffer);
+		executeCommand(buffer);
+	}
+									
+	return 0xDEADBEEF; 
+}
+
+
 

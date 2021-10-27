@@ -47,4 +47,14 @@ void clearScreen();
 
 char consoleInUse();
 
+void exit();
+
+void printProcess();
+
+void killProcess(uint32_t pid);
+
+void changePriority(uint32_t pid, uint8_t newPriority);
+
+void changeState(uint32_t pid);
+
 #endif

@@ -23,6 +23,7 @@ EXTERN exceptionDispatcher
 EXTERN runShells
 EXTERN rebootConsole
 EXTERN saveBackup
+EXTERN switchProcess
 SECTION .text
 
 
@@ -63,27 +64,37 @@ SECTION .text
 %endmacro
 
 %macro irqHandlerMaster 1
-	pushState
 	cli
+	pushState
 	
 	mov rax, %1
 	cmp rax, 1
 	jne .continue
 	call saveBackup
-
 .continue:
 	mov rdi, %1
 	call irqDispatcher
 
+	; signal pic EOI (End of Interrupt)
 	mov al, 20h
 	out 20h, al
 
-	sti
+	mov rax, %1
+	cmp rax, 0
+	jne .end
+
+.timerTick:
+	mov rdi, rsp ; pasa el rsp para actualizar el PCB del proceso actual y poder retomar luego
+	call switchProcess
+	cmp rax, 0
+	je .end
+	mov rsp, rax
+
+.end:
 	popState
+	sti
 	iretq
 %endmacro
-
-
 
 %macro exceptionHandler 1
 	pushState

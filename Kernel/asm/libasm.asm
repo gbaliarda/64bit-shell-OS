@@ -1,5 +1,7 @@
 GLOBAL cpuVendor
-GLOBAL initFirstProcess
+GLOBAL initProcess
+
+GLOBAL runScheduler
 
 section .text
 	
@@ -27,27 +29,29 @@ cpuVendor:
 	pop rbp
 	ret
 
-initFirstProcess:
+initProcess:
 	push rbp
 	push rsp
 	mov rax, rsp
 	
 	mov rsp, rdi
-	sub rdi, 8
+	sub rdi, 160 ; deja el rsp al final del "stackframe de int", para que luego se haga popstate + iretq y se popee en el orden correcto
 	mov rbp, rdi
-	push qword 0x0
-	push qword rbp
-	push qword 0x202
-	push qword 0x8
-	push qword 0x400000
-	; registros
-	push qword 0x0 ; argc
-	push qword 0x0 ; argv
+
+	; <-rsp
+	push qword 0x0   ; ss
+	push qword rsp   ; rsp
+	push qword 0x202 ; rflags
+	push qword 0x8   ; cs
+	push qword rsi   ; rip
+	; registros generales
 	push qword 0x1
 	push qword 0x2
 	push qword 0x3
 	push qword 0x4
 	push qword 0x5
+	push qword rdx ; argc
+	push qword rcx ; argv
 	push qword 0x6
 	push qword 0x7
 	push qword 0x8
@@ -58,6 +62,11 @@ initFirstProcess:
 	push qword 0xD
 
 	mov rsp, rax
+	mov rax, rbp
 	pop rsp
 	pop rbp
 	ret
+
+runScheduler:	
+	sti
+	int 20h
