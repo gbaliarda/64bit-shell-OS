@@ -6,7 +6,7 @@
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue);
 
 void p1(int argc, char **argv) {
-	for(int z = 0; z < 1; z++) {
+	for(int z = 0; z < 100; z++) {
 		for (int j = 0; j < 10000000; j++);
 		for (int i = 0; i < 10000000; i++);
 			printf("Cantidad de argumentos: "); printInt(argc);
@@ -47,8 +47,15 @@ void p3() {
 
 void loop(int segundos) {
 	while(1) {
-		for(int i = 0; i < 10000000*segundos; i++)
-		printf("Hola!");
+		for(int i = 0; i < 100000000; i++);
+		printf("H");
+	}
+}
+
+void loop2(int segundos) {
+	while(1) {
+		for(int i = 0; i < 100000000; i++);
+		printf("C");
 	}
 }
 
@@ -187,7 +194,9 @@ void executeCommand(char * buffer) {
 	else if (compareStrings(args[0], "p1"))
 		sys_createProcess((uint64_t)&p1, 1024, 10, argNum, (char **)args);
 	else if(compareStrings(args[0], "loop")) {
-		sys_createProcess((uint64_t)&loop, 1024, 1, argNum, (char **)args);
+		sys_createProcess((uint64_t)&loop, 1024, 2, argNum, (char **)args);
+	} else if(compareStrings(args[0], "loop2")) {
+		sys_createProcess((uint64_t)&loop2, 1024, 2, argNum, (char **)args);
 	} else if(compareStrings(args[0], "ps")) {
 		sys_printProcess();
 	} else if(compareStrings(args[0], "kill")) {
@@ -195,7 +204,7 @@ void executeCommand(char * buffer) {
 		sys_killProcess((uint32_t) atoi(args[1], &ok));
 	} else if(compareStrings(args[0], "nice")) {
 		int ok = 1;
-		sys_changePriority((uint32_t) atoi(args[1], &ok), (uint8_t) atoi(args[1], &ok));
+		sys_changePriority((uint32_t) atoi(args[1], &ok), (uint8_t) atoi(args[2], &ok));
 	} else if(compareStrings(args[0], "block")) {
 		int ok = 1;
 		sys_changeState((uint32_t) atoi(args[1], &ok));

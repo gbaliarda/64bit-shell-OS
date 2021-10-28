@@ -242,24 +242,57 @@ void printProcessList() {
   }
 }
 
-// static pcb *getPCB(ListNode *node, uint32_t pid) {
-//   if(node == NULL)
-//     return NULL;
+static pcb *getPCB(ListNode *node, uint32_t pid) {
+  if(node == NULL)
+    return NULL;
 
-//   if(node->process.pid == pid)
-//     return &node->process;
+  if(node->process.pid == pid)
+    return &node->process;
 
-//   return getPCB(node->next, pid);
-// }  
+  return getPCB(node->next, pid);
+}  
 
 void changeProcessPriority(uint32_t pid, uint8_t newPriority) {
-  // pcb *pidPCB = getPCB(scheduler->start, pid);
-  // scheduler->start = deleteProcess(scheduler->start, pid);
-  // createProcess
+  if (pid <= 1 || newPriority <= 1)
+    return;
+  
+  pcb *pidPCB = getPCB(scheduler->start, pid);
+  if (pidPCB == NULL)
+    return;
+
+  pidPCB->priority = newPriority;
+  pidPCB->auxPriority = newPriority;
+
+  ListNode *headPID = scheduler->start;
+  while (headPID->next->process.pid != pid)
+    headPID = headPID->next;
+
+  ListNode *process = headPID->next;
+  headPID->next = process->next;
+
+  headPID = scheduler->start;
+  while (headPID->next != NULL && newPriority >= headPID->next->process.priority)
+    headPID = headPID->next;
+
+  ListNode *aux = headPID->next;
+  headPID->next = process;
+  process->next = aux;
 }
 
 void changeProcessState(uint32_t pid) {
-  //
+  if (pid <= 1)
+    return;
+
+  pcb *pidPCB = getPCB(scheduler->start, pid);
+  if (pidPCB == NULL)
+    return;
+
+  if (pidPCB->pstate == 1) {
+    pidPCB->pstate = 0;
+    if(pid == scheduler->currentProcess->process.pid)
+      runScheduler();
+  } else if (pidPCB -> pstate == 0)
+    pidPCB->pstate = 1;
 }
 
 void waitForKeyboard() {
