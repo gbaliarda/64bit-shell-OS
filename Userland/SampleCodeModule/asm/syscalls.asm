@@ -4,6 +4,9 @@ GLOBAL sys_inforeg
 GLOBAL sys_printmem
 GLOBAL sys_getDateTime
 GLOBAL sys_clearScreen
+GLOBAL sys_alloc
+GLOBAL sys_free
+GLOBAL sys_memStatus
 GLOBAL sys_createProcess
 GLOBAL sys_exit
 GLOBAL sys_printProcess

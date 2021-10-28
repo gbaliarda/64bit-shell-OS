@@ -26,6 +26,7 @@ typedef struct WaitingKeyboardList {
 typedef struct Scheduler {
   uint32_t quantum;
   uint32_t priorityQuantum;
+  uint8_t fgTaken;
   ListNode *currentProcess;
   ListNode *start;  // lista ordenada por prioridades, los mas prioritarios primero
 } Scheduler;
@@ -48,6 +49,7 @@ void initScheduler() {
   scheduler->quantum = QUANTUM-1;
   scheduler->priorityQuantum = PRIORITY_QUANTUM;
   scheduler->start = NULL;
+  scheduler->fgTaken = 0;
   pid = 1;
   firstProcess = 1;
 
@@ -119,6 +121,8 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
 }
 
 void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv) {
+  if(priority == 1 && pid > 1)
+    scheduler->fgTaken = 1;
   uint64_t processMemory = (uint64_t) alloc(size);
 	uint64_t sp = initProcess(processMemory + size, ip, argc, argv);
   scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv[0]);
@@ -167,10 +171,13 @@ uint64_t switchProcess(uint64_t sp) {
   ListNode *firstMinReadyProcess = scheduler->start;
   ListNode *auxFirstMinReadyProcess = firstMinReadyProcess;
   while(auxFirstMinReadyProcess != NULL && auxFirstMinReadyProcess->process.pid != scheduler->currentProcess->process.pid) {
-    if(firstMinReadyProcess->process.pstate != 1)
+    if (auxFirstMinReadyProcess->process.pid == 1 && scheduler->fgTaken)
+      continue;
+
+    if (firstMinReadyProcess->process.pstate != 1)
       firstMinReadyProcess = auxFirstMinReadyProcess;
 
-    if(auxFirstMinReadyProcess->process.auxPriority < firstMinReadyProcess->process.auxPriority && firstMinReadyProcess->process.pstate == 1)
+    if (auxFirstMinReadyProcess->process.auxPriority < firstMinReadyProcess->process.auxPriority && firstMinReadyProcess->process.pstate == 1)
       firstMinReadyProcess = auxFirstMinReadyProcess;
     auxFirstMinReadyProcess = auxFirstMinReadyProcess->next;
   }
@@ -213,11 +220,15 @@ static ListNode * deleteProcess(ListNode *node, uint32_t pid) {
 }
 
 void exitCurrentProcess() {
+  if(scheduler->currentProcess->process.priority == 1)
+    scheduler->fgTaken = 0;
+
   scheduler->start = deleteProcess(scheduler->start, scheduler->currentProcess->process.pid);
 }
 
 void killPid(uint32_t pid) {
-  scheduler->start = deleteProcess(scheduler->start, pid);
+  if(pid > 1)
+    scheduler->start = deleteProcess(scheduler->start, pid);
 }
 
 void printProcessList() {
@@ -275,7 +286,6 @@ void awakeKeyboardQueue() {
     return;
   waitingKeyboardList->size--;
   waitingKeyboardList->current->process->pstate = 1;
-  waitingKeyboardList->current->process->auxPriority = 1;
   waitingKeyboardList->current = waitingKeyboardList->current->next;
 }
 

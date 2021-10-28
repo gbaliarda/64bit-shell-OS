@@ -4,6 +4,7 @@
 #include "../include/scheduler.h"
 #include "../include/semaphore.h"
 #include "../include/pipes.h"
+#include "../include/naiveConsole.h"
 
 static int sysNum;
 
