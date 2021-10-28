@@ -163,3 +163,5 @@ int sys_pipeRead(fdPipe *fd, char* buffer);
 int sys_openPipeId(fdPipe *fd, uint32_t id, uint8_t reader);
 
 void sys_printPipes();
+
+void sys_yield();

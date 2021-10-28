@@ -32,8 +32,10 @@ void p2() {
 void p3() {
 	fdPipe *fd = sys_createFdPipe();
 
-	if (sys_openPipeId(fd, 1, 1) == -1)
+	if (sys_openPipeId(fd, 1, 1) == -1) {
+		sys_closeFdPipe(fd);
 		sys_exit();
+	}
 
 	char buff[10];
 	sys_pipeRead(fd, buff);
@@ -49,13 +51,6 @@ void loop(int segundos) {
 	while(1) {
 		for(int i = 0; i < 100000000; i++);
 		printf("H");
-	}
-}
-
-void loop2(int segundos) {
-	while(1) {
-		for(int i = 0; i < 100000000; i++);
-		printf("C");
 	}
 }
 
@@ -104,11 +99,17 @@ void executeCommand(char * buffer) {
 		printf("2: inforeg\n");
 		printf("3: printmem\n");
 		printf("4: printDateTime\n");
-		printf("5: zeroException\n");
-		printf("6: opcodeException\n");
-		printf("7: clear\n");
-		printf("8: computeZeros\n");
-		printf("9: cpuid\n");
+		printf("5: clear\n");
+		printf("6: computeZeros\n");
+		printf("7: cpuid\n");
+		printf("8: mem\n");
+		printf("9: sem\n");
+		printf("10: kill\n");
+		printf("11: nice\n");
+		printf("12: block\n");
+		printf("13: loop\n");
+		printf("14: pipe\n");
+		printf("15: ps\n");
 	} 
 	else if (compareStrings(args[0], "inforeg")) {
 		Registers registers;
@@ -152,13 +153,7 @@ void executeCommand(char * buffer) {
 		putChar(':');
 		printInt(dateTime.seconds);
 		putChar('\n');
-	} 
-	else if (compareStrings(args[0], "zeroException")) {
-		divZero();
-	}
-	else if (compareStrings(args[0], "opcodeException"))
-		throwInvalidOpcode();
-	else if (compareStrings(args[0], "clear"))
+	} else if (compareStrings(args[0], "clear"))
 		sys_clearScreen();
 	else if (compareStrings(args[0], "computeZeros")) {
 		char res[20];
@@ -193,29 +188,40 @@ void executeCommand(char * buffer) {
 	}
 	else if (compareStrings(args[0], "p1"))
 		sys_createProcess((uint64_t)&p1, 1024, 10, argNum, (char **)args);
-	else if(compareStrings(args[0], "loop")) {
+	else if (compareStrings(args[0], "loop")) {
 		sys_createProcess((uint64_t)&loop, 1024, 2, argNum, (char **)args);
-	} else if(compareStrings(args[0], "loop2")) {
-		sys_createProcess((uint64_t)&loop2, 1024, 2, argNum, (char **)args);
-	} else if(compareStrings(args[0], "ps")) {
+	} else if (compareStrings(args[0], "ps")) {
 		sys_printProcess();
-	} else if(compareStrings(args[0], "kill")) {
+	} else if (compareStrings(args[0], "kill")) {
 		int ok = 1;
 		sys_killProcess((uint32_t) atoi(args[1], &ok));
-	} else if(compareStrings(args[0], "nice")) {
+	} else if (compareStrings(args[0], "nice")) {
 		int ok = 1;
 		sys_changePriority((uint32_t) atoi(args[1], &ok), (uint8_t) atoi(args[2], &ok));
-	} else if(compareStrings(args[0], "block")) {
+	} else if (compareStrings(args[0], "block")) {
 		int ok = 1;
 		sys_changeState((uint32_t) atoi(args[1], &ok));
-	} else if(compareStrings(args[0], "p2"))
+	} else if (compareStrings(args[0], "p2"))
 		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, (char **)args);
-	else if(compareStrings(args[0], "p3"))
+	else if (compareStrings(args[0], "p3"))
 		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
-	else if(compareStrings(args[0], "psem"))
+	else if (compareStrings(args[0], "sem"))
 		sys_printSemaphores();
-	else if(compareStrings(args[0], "pipe"))
+	else if (compareStrings(args[0], "pipe"))
 		sys_printPipes();
+	else if (compareStrings(args[0], "mem")) {
+		unsigned int mem[3];
+		sys_memStatus(mem);
+		printf("Heap size: ");
+		printInt(mem[0]);
+		printf(" bytes\n");
+		printf("Heap left: ");
+		printInt(mem[1]);
+		printf(" bytes\n");
+		printf("Heap used: ");
+		printInt(mem[2]);
+		printf(" bytes\n");
+	}
 	else
 		printf("Command not found, try 'help'\n");
 

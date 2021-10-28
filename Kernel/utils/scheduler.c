@@ -217,7 +217,8 @@ void exitCurrentProcess() {
 }
 
 void killPid(uint32_t pid) {
-  scheduler->start = deleteProcess(scheduler->start, pid);
+  if(pid > 1)
+    scheduler->start = deleteProcess(scheduler->start, pid);
 }
 
 void printProcessList() {

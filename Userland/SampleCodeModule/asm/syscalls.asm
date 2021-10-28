@@ -9,6 +9,9 @@ GLOBAL sys_exit
 GLOBAL sys_printProcess
 GLOBAL sys_killProcess
 GLOBAL sys_changePriority
+GLOBAL sys_alloc
+GLOBAL sys_free
+GLOBAL sys_memStatus
 GLOBAL sys_changeState
 GLOBAL sys_semOpen
 GLOBAL sys_semClose
@@ -22,6 +25,7 @@ GLOBAL sys_pipeWrite
 GLOBAL sys_pipeRead
 GLOBAL sys_openPipeId
 GLOBAL sys_printPipes
+GLOBAL sys_yield
 
 section .text
 
@@ -156,5 +160,10 @@ sys_openPipeId:
 
 sys_printPipes:
   mov rax, 34
+  int 80h
+  ret
+
+sys_yield:
+  mov rax, 35
   int 80h
   ret
