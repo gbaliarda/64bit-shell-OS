@@ -1,5 +1,4 @@
 #include "libc.h"
-#include <string.h>
 
 #define MAX_ARG_AMT 5
 #define MAX_ARG_COMMAND_LEN 20
@@ -48,16 +47,14 @@ void p3() {
 
 void loop(int segundos) {
 	while(1) {
+		for(int i = 0; i < 10000000*segundos; i++)
 		printf("Hola!");
 	}
 }
 
 void executeCommand(char * buffer) {
 	int index = 0;
-	// char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1];
-	char **args = (char **)sys_alloc((MAX_ARG_AMT + 1) * (MAX_ARG_COMMAND_LEN + 1));
-	for(int i = 1; i <= MAX_ARG_AMT; i++)
-		args[i] = (char *)((uint64_t)args[0]+(MAX_ARG_COMMAND_LEN+1)*i);
+	char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1];
 
 	while (index < MAX_ARG_COMMAND_LEN && buffer[index] && buffer[index] != ' ') {
 		args[0][index] = buffer[index];
@@ -66,7 +63,6 @@ void executeCommand(char * buffer) {
 
 	if (index == MAX_ARG_COMMAND_LEN && buffer[index] != ' ') {
 		printf("Command not found, try 'help'\n");
-		sys_free(args);
 		return;
 	}
 
@@ -93,8 +89,6 @@ void executeCommand(char * buffer) {
 		while (buffer[index] && buffer[index] == ' ')
 			index++;	
 	}
-
-
 
 
 	if (compareStrings(args[0], "help")) {
@@ -168,7 +162,6 @@ void executeCommand(char * buffer) {
 		c = strToDouble(args[3], &ok);
 		if (!ok) {
 			printf("Invalid arguments a, b or c\n");
-			sys_free(args);
 			return;
 		}
 		double root1;
@@ -191,10 +184,10 @@ void executeCommand(char * buffer) {
 		int maxEaxValue = cpuid(&cpuidData);
 		printProcessorInfo(&cpuidData, maxEaxValue);
 	}
-	else if (compareStrings(args[0], "p1")) {
-		sys_createProcess((uint64_t)&p1, 1024, 10, argNum, args);
-	} else if(compareStrings(args[0], "loop")) {
-		sys_createProcess((uint64_t)&loop, 1024, 1, argNum, args);
+	else if (compareStrings(args[0], "p1"))
+		sys_createProcess((uint64_t)&p1, 1024, 10, argNum, (char **)args);
+	else if(compareStrings(args[0], "loop")) {
+		sys_createProcess((uint64_t)&loop, 1024, 1, argNum, (char **)args);
 	} else if(compareStrings(args[0], "ps")) {
 		sys_printProcess();
 	} else if(compareStrings(args[0], "kill")) {
@@ -207,9 +200,9 @@ void executeCommand(char * buffer) {
 		int ok = 1;
 		sys_changeState((uint32_t) atoi(args[1], &ok));
 	} else if(compareStrings(args[0], "p2"))
-		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, args);
+		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, (char **)args);
 	else if(compareStrings(args[0], "p3"))
-		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, args);
+		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
 	else if(compareStrings(args[0], "psem"))
 		sys_printSemaphores();
 	else if(compareStrings(args[0], "pipe"))
@@ -217,7 +210,6 @@ void executeCommand(char * buffer) {
 	else
 		printf("Command not found, try 'help'\n");
 
-	sys_free(args);
 }
 
 void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
