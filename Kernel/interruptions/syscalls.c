@@ -26,6 +26,11 @@ int64_t write(char* buf, uint64_t count) {
 }
 
 int read(char* buf, int limit) {
+  pcb *currentProcess = getCurrentProcess();
+  if (currentProcess->priority != 1) {
+    buf[0] = 0;
+    return 0;
+  }
   int count = 0;
   unsigned char key;
   fdPipe *stdin = getCurrentStdin();
@@ -39,6 +44,7 @@ int read(char* buf, int limit) {
     } else {
       key = (unsigned char) pipeRead(stdin, NULL, 1);
     }
+
 
     switch (key) {
       case 0:
@@ -61,6 +67,10 @@ int read(char* buf, int limit) {
         loadRegisters(backupRegisters, backupAuxRegisters);
         break;
 
+      case 18:
+        exit();
+        break;
+
       // shifts izq, der y sus release; y bloq mayus
       case 11:
       case 14:
@@ -72,7 +82,9 @@ int read(char* buf, int limit) {
       
       default: 
         if(mayus && key >= 'a' && key <= 'z')
-        key -= 'a' - 'A';
+          key -= 'a' - 'A';
+        if(mayus && key == '6')
+          key = '&';
         if (count < 100)
           buf[count] = key;
         count++;

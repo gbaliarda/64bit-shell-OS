@@ -22,7 +22,7 @@ static const uint64_t PageSize = 0x1000;
 
 static void * const sampleCodeModuleAddress = (void*)0x400000;
 static void * const sampleDataModuleAddress = (void*)0x500000;
-static void * const heapModuleAddress = (void*)0x600000;
+static void * const heapModuleAddress = (void*)0x1000000;
 static void * const memoryManagerAddress = (void*)0x50000;
 
 typedef int (*EntryPoint)();
@@ -74,9 +74,13 @@ int main() {
 
 	// Creamos el primer proceso a mano
 	initScheduler();
+<<<<<<< HEAD
 	char argv[1][10] = {"Shell"};
 	argv[0][5] = 0;
 	createProcess((uint64_t)sampleCodeModuleAddress, 1, 1, (char **) argv, NULL, NULL);
+=======
+	createProcessWrapper((uint64_t)sampleCodeModuleAddress, 4096, 1, 1, "Shell");
+>>>>>>> argv+fg+commands
 
 	ncClear();
 
