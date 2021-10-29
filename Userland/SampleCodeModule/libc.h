@@ -1,5 +1,7 @@
 #ifndef LIB_H
 #define LIB_H
+#define MAX_ARG_AMT 5
+#define MAX_ARG_COMMAND_LEN 20
 
 #include <stdint.h>
 

@@ -1,9 +1,4 @@
-#include "./include/libc.h"
-#include "./include/syscalls.h"
-#include "./include/apps.h"
-
-#define MAX_ARG_AMT 5
-#define MAX_ARG_COMMAND_LEN 20
+#include "./libc.h"
 
 int main() {
 	char buffer[101];

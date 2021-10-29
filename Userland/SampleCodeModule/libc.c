@@ -1,4 +1,6 @@
-#include "./include/libc.h"
+#include "./libc.h"
+#include "./syscalls.h"
+#include "./apps.h"
 
 static int strlen(const char *str) {
   int len = 0;
@@ -258,6 +260,86 @@ void createProcess(uint64_t ip, unsigned int argc, char argv[6][21]) {
   sys_free(args);
 }
 
+static void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
+	if(maxEaxValue == -1) {
+		printf("cpuid not supported.\n");
+		return;
+	} 
+	else if (maxEaxValue < 1) {
+		printf("Processor Info not supported.\n");
+		return;
+	}
+	
+	printf("mmx_support: ");
+	cpuidData->mmx ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("sse_support: ");
+	cpuidData->sse ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("sse2_support: ");
+	cpuidData->sse2 ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("sse3_support: ");
+	cpuidData->sse3 ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("pclmulqdq_support: ");
+	cpuidData->pclmulqdq ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("vmx_support: ");
+	cpuidData->vmx ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("smx_support: ");
+	cpuidData->smx ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("fma_support: ");
+	cpuidData->fma ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("sse4.1_support: ");
+	cpuidData->sse41 ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("sse4.2_support: ");
+	cpuidData->sse42 ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("aes_support: ");
+	cpuidData->aes ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("avx_support: ");
+	cpuidData->avx ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("f16c_support: ");
+	cpuidData->f16c ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	if(maxEaxValue < 7) {
+		printf("Extended Features not supported.\n");
+		return;
+	}
+
+	printf("vaes_support: ");
+	cpuidData->vaes ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("vpclmulqdq_support: ");
+	cpuidData->vpclmulqdq ? printf("Yes") : printf("No");
+	putChar('\n');
+
+	printf("avx2_support: ");
+	cpuidData->avx2 ? printf("Yes") : printf("No");
+	putChar('\n');
+}
+
 void executeCommand(char * buffer) {
 	int index = 0;
 	char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1];
@@ -434,84 +516,4 @@ void executeCommand(char * buffer) {
 	else
 		printf("Command not found, try 'help'\n");
 
-}
-
-static void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
-	if(maxEaxValue == -1) {
-		printf("cpuid not supported.\n");
-		return;
-	} 
-	else if (maxEaxValue < 1) {
-		printf("Processor Info not supported.\n");
-		return;
-	}
-	
-	printf("mmx_support: ");
-	cpuidData->mmx ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("sse_support: ");
-	cpuidData->sse ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("sse2_support: ");
-	cpuidData->sse2 ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("sse3_support: ");
-	cpuidData->sse3 ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("pclmulqdq_support: ");
-	cpuidData->pclmulqdq ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("vmx_support: ");
-	cpuidData->vmx ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("smx_support: ");
-	cpuidData->smx ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("fma_support: ");
-	cpuidData->fma ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("sse4.1_support: ");
-	cpuidData->sse41 ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("sse4.2_support: ");
-	cpuidData->sse42 ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("aes_support: ");
-	cpuidData->aes ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("avx_support: ");
-	cpuidData->avx ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("f16c_support: ");
-	cpuidData->f16c ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	if(maxEaxValue < 7) {
-		printf("Extended Features not supported.\n");
-		return;
-	}
-
-	printf("vaes_support: ");
-	cpuidData->vaes ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("vpclmulqdq_support: ");
-	cpuidData->vpclmulqdq ? printf("Yes") : printf("No");
-	putChar('\n');
-
-	printf("avx2_support: ");
-	cpuidData->avx2 ? printf("Yes") : printf("No");
-	putChar('\n');
 }

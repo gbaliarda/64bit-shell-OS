@@ -1,7 +1,7 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#include "libc.h"
+#include "./libc.h"
 
 void sys_write(unsigned int fd, const char *buffer, unsigned int count);
 

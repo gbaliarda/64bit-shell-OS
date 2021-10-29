@@ -1,5 +1,6 @@
-#include "./include/apps.h"
-#include "./include/syscalls.h"
+#include "./apps.h"
+#include "./syscalls.h"
+#include "./libc.h"
 
 void cat(int argc, const char* argv[]) {
 	char buffer[200];
@@ -18,10 +19,12 @@ void wc(int argc, const char *argv[]) {
 }
 
 void filter(int argc, const char *argv[]) {
-	if (argc > 1) {
-		int i = 0;
-		while (argv[1][i]) {
-			switch (argv[1][i]) {
+	char buffer[200];
+  while(1) {
+    int n = scanf(buffer);
+    int i = 0;
+		while (buffer[i]) {
+			switch (buffer[i]) {
 				case 'a':
 				case 'e':
 				case 'i':
@@ -34,10 +37,11 @@ void filter(int argc, const char *argv[]) {
 				case 'U':
 					break;
 				default:
-					putChar(argv[1][i]);
+					putChar(buffer[i]);
 			}
 			i++;
 		}
+    printf("\n");
 	}
 	sys_exit();
 }
@@ -54,7 +58,7 @@ void p1(int argc, const char* argv[]) {
 	sys_exit();
 }
 
-void p2() {
+void p2(int argc, const char* argv[]) {
 	fdPipe *fd = sys_createFdPipe();
 
 	sys_openPipeId(fd, 1, 0);
@@ -64,7 +68,7 @@ void p2() {
 	sys_exit();
 }
 
-void p3() {
+void p3(int argc, const char* argv[]) {
 	fdPipe *fd = sys_createFdPipe();
 
 	if (sys_openPipeId(fd, 1, 1) == -1) {
@@ -82,7 +86,7 @@ void p3() {
 }
  
 
-void loop(int segundos) {
+void loop(int argc, const char* argv[]) {
 	while(1) {
 		for(int i = 0; i < 100000000; i++);
 		printf("H");
