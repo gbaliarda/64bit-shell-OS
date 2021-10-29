@@ -3,6 +3,8 @@ GLOBAL initProcess
 
 GLOBAL runScheduler
 
+GLOBAL _xchg
+
 section .text
 	
 cpuVendor:
@@ -70,3 +72,9 @@ initProcess:
 runScheduler:	
 	sti
 	int 20h
+
+
+_xchg:
+	mov rax, rsi 
+	xchg [rdi], eax
+	ret
