@@ -8,6 +8,8 @@
     "scheduler.h": "c",
     "idtloader.h": "c",
     "stdint.h": "c",
-    "stdint-gcc.h": "c"
+    "stdint-gcc.h": "c",
+    "libc.h": "c",
+    "apps.h": "c"
   }
 }

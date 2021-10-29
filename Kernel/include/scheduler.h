@@ -6,8 +6,7 @@
 #include "../include/semaphore.h"
 
 typedef struct pcb {
-  char *name;
-  uint8_t type;
+  char **args;
   uint32_t pid;
   uint8_t pstate;
   uint8_t priority;
@@ -21,7 +20,9 @@ void initScheduler();
 
 uint64_t switchProcess(uint64_t sp);
 
-void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv);
+void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char **argv);
+
+void createProcessWrapper(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char * argv);
 
 void exitCurrentProcess();
 
@@ -38,5 +39,7 @@ void waitForKeyboard();
 void awakeKeyboardQueue();
 
 pcb *blockCurrentProcess();
+
+pcb *getCurrentProcess();
 
 #endif

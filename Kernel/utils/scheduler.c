@@ -26,6 +26,7 @@ typedef struct WaitingKeyboardList {
 typedef struct Scheduler {
   uint32_t quantum;
   uint32_t priorityQuantum;
+  uint8_t fgTaken;
   ListNode *currentProcess;
   ListNode *start;  // lista ordenada por prioridades, los mas prioritarios primero
 } Scheduler;
@@ -48,6 +49,7 @@ void initScheduler() {
   scheduler->quantum = QUANTUM-1;
   scheduler->priorityQuantum = PRIORITY_QUANTUM;
   scheduler->start = NULL;
+  scheduler->fgTaken = 0;
   pid = 1;
   firstProcess = 1;
 
@@ -67,20 +69,20 @@ void initScheduler() {
   }
   aux->next = waitingKeyboardList->current;
 
-  uint64_t dummyMemory = (uint64_t) alloc(500);
+  uint64_t dummyMemory = (uint64_t) alloc(2048);
   
-	uint64_t sp = initProcess(dummyMemory + 500, (uint64_t)&dummyProcess, 0, NULL);
+	uint64_t sp = initProcess(dummyMemory + 2048, (uint64_t)&dummyProcess, 0, NULL);
   dummy = (ListNode *) alloc(sizeof(ListNode));
   dummy->process.pid = 0;
   dummy->process.sp = sp;
   dummy->process.processMemory = dummyMemory;
   dummy->process.pstate = 1;
   dummy->process.priority = 1;
-  dummy->process.name = "Dummy";
+  dummy->process.args = NULL;
   dummy->next = scheduler->start;
 }
 
-static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char *name) {
+static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char **args) {
 
   if (node == NULL) {
     ListNode *newNode = (ListNode *) alloc(sizeof(ListNode));
@@ -91,13 +93,12 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
     newNode->process.sp = sp;
     newNode->process.bp = sp;
     newNode->process.processMemory = processMemory;
-    newNode->process.type = 1;
-    newNode->process.name = name;
+    newNode->process.args = args;
     return newNode;
   }
 
   if (node->next != NULL && priority >= node->next->process.priority) {
-    node->next = loadProcess(node->next, pid, priority, sp, processMemory, name);
+    node->next = loadProcess(node->next, pid, priority, sp, processMemory, args);
     return node;
   }
 
@@ -113,18 +114,37 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   newNode->process.sp = sp;
   newNode->process.bp = sp;
   newNode->process.processMemory = processMemory;
-  newNode->process.type = 1;
-  newNode->process.name = name;
+  newNode->process.args = args;
   return node;
 }
 
-void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv) {
+void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char **argv) {
+  if(priority == 1 && pid > 1)
+    scheduler->fgTaken = 1;
+
   uint64_t processMemory = (uint64_t) alloc(size);
 	uint64_t sp = initProcess(processMemory + size, ip, argc, argv);
-  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv[0]);
+  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv);
+}
+
+void createProcessWrapper(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char * argv) {
+	char **args = (char **) alloc(argc*21);
+	int j = 0;
+  for (int i = 0; i < argc; i++) {
+    int k = 0;
+    if(i != 0) {
+      args[i] = (char * )((uint64_t)args[0]+j);
+    }
+    while(argv[j]) 
+        args[i][k++] = argv[j++];
+    args[i][k] = 0;
+    j++;
+  }
+  createProcess(ip, size, priority, argc, args);
 }
 
 uint64_t switchProcess(uint64_t sp) {
+
   // Para el primer proceso no actualizamos el sp, usamos el hardcodeado
   if (firstProcess) {
     firstProcess = 0;
@@ -152,13 +172,12 @@ uint64_t switchProcess(uint64_t sp) {
 
   // guardar el sp del proceso actual en su PCB
   scheduler->currentProcess->process.sp = sp;
-  
+
   ListNode *nextProcess = scheduler->currentProcess->next;
   ListNode *auxNextProcess = nextProcess;
   while(auxNextProcess != NULL) {
     if(nextProcess->process.pstate != 1)
       nextProcess = auxNextProcess;
-
     if(auxNextProcess->process.auxPriority < nextProcess->process.auxPriority && auxNextProcess->process.pstate == 1)
       nextProcess = auxNextProcess;
     auxNextProcess = auxNextProcess->next;
@@ -167,9 +186,18 @@ uint64_t switchProcess(uint64_t sp) {
   ListNode *firstMinReadyProcess = scheduler->start;
   ListNode *auxFirstMinReadyProcess = firstMinReadyProcess;
   while(auxFirstMinReadyProcess != NULL && auxFirstMinReadyProcess->process.pid != scheduler->currentProcess->process.pid) {
-    if(firstMinReadyProcess->process.pstate != 1)
-      firstMinReadyProcess = auxFirstMinReadyProcess;
+    if (auxFirstMinReadyProcess->process.pid == 1 && scheduler->fgTaken) {
+      if (firstMinReadyProcess->process.pid == 1)
+        firstMinReadyProcess = firstMinReadyProcess->next;
+      auxFirstMinReadyProcess = auxFirstMinReadyProcess->next;
+      continue;
+    }
 
+    if(firstMinReadyProcess->process.pstate != 1 && (!scheduler->fgTaken || auxFirstMinReadyProcess->process.pid != 1)) {
+      firstMinReadyProcess = auxFirstMinReadyProcess;
+    }
+
+    
     if(auxFirstMinReadyProcess->process.auxPriority < firstMinReadyProcess->process.auxPriority && firstMinReadyProcess->process.pstate == 1)
       firstMinReadyProcess = auxFirstMinReadyProcess;
     auxFirstMinReadyProcess = auxFirstMinReadyProcess->next;
@@ -177,6 +205,9 @@ uint64_t switchProcess(uint64_t sp) {
 
   if(firstMinReadyProcess->process.pstate != 1 && scheduler->currentProcess->process.pstate == 1 && scheduler->currentProcess->process.pid != 0)
     firstMinReadyProcess = scheduler->currentProcess;
+
+  if(scheduler->fgTaken && firstMinReadyProcess->process.pid == 1) 
+    firstMinReadyProcess = NULL;
 
   if((nextProcess == NULL || nextProcess->process.pstate != 1) && (firstMinReadyProcess == NULL || firstMinReadyProcess->process.pstate != 1)) {
     scheduler->currentProcess = dummy;
@@ -203,6 +234,7 @@ static ListNode * deleteProcess(ListNode *node, uint32_t pid) {
     node->process.pstate = 2;
     ListNode *aux = node->next;
     deleteProcessFromSemaphores(pid);
+    free((void *)node->process.args);
     free((void *)node->process.processMemory);
     free((void *)node);
     return aux;
@@ -213,6 +245,9 @@ static ListNode * deleteProcess(ListNode *node, uint32_t pid) {
 }
 
 void exitCurrentProcess() {
+  if(scheduler->currentProcess->process.priority == 1)
+    scheduler->fgTaken = 0;
+
   scheduler->start = deleteProcess(scheduler->start, scheduler->currentProcess->process.pid);
 }
 
@@ -225,7 +260,7 @@ void printProcessList() {
   ncPrint("Name    PID    Priority     SP       BP     Type        State\n");
   ListNode *aux = scheduler->start;
   while(aux != NULL) {
-    // ncPrint(aux->process.name);
+    aux->process.pid == 1 ? ncPrint("Shell") : ncPrint(aux->process.args[0]);
     ncPrint("     ");
     ncPrintDec(aux->process.pid);
     ncPrint("     ");
@@ -235,7 +270,7 @@ void printProcessList() {
     ncPrint("     ");
     ncPrintHex(aux->process.bp);
     ncPrint("     ");
-    ncPrint(aux->process.type == 1 ? "foreground" : "background");
+    ncPrint(aux->process.priority == 1 ? "foreground" : "background");
     ncPrint("     ");
     ncPrint(aux->process.pstate ? "Ready" : "Blocked");
     ncNewline();
@@ -305,15 +340,18 @@ void waitForKeyboard() {
 }
 
 void awakeKeyboardQueue() {
-  if(waitingKeyboardList->size == 0)
+  if (waitingKeyboardList->size == 0)
     return;
   waitingKeyboardList->size--;
   waitingKeyboardList->current->process->pstate = 1;
-  waitingKeyboardList->current->process->auxPriority = 1;
   waitingKeyboardList->current = waitingKeyboardList->current->next;
 }
 
 pcb *blockCurrentProcess() {
   scheduler->currentProcess->process.pstate = 0;
+  return &scheduler->currentProcess->process;
+}
+
+pcb *getCurrentProcess() {
   return &scheduler->currentProcess->process;
 }
