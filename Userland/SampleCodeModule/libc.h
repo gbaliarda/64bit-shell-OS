@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#define NULL ((void *)0)
+
 typedef struct Time {
 	int hour;
 	int minutes;
@@ -72,7 +74,7 @@ typedef struct fdPipe {
   struct pipe *pipe;
 } fdPipe;
 
-void sys_write(unsigned int fd, const char *buffer, unsigned int count);
+void sys_write(const char *buffer, unsigned int count);
 
 int sys_read(char *buffer, int limit);
 
@@ -100,17 +102,15 @@ uint64_t atoi(char *str, int *ok);
 
 uint64_t hex2int(char *hex, int *ok);
 
-void throwInvalidOpcode();
-
 void sys_clearScreen();
 
 int computeZeros(double a, double b, double c, double *root1, double *root2);
 
-void divZero();
-
 void dtos(double num, char *buff);
 
 double strToDouble(char *str, int *ok);
+
+char* strcpy(char* destination, const char* source);
 
 int cpuid(cpuInformation *cpuidData);
 
@@ -128,7 +128,7 @@ void sys_free(void *memoryToFree);
 
 void sys_memStatus(unsigned int *status);
 
-void sys_createProcess(uint64_t ip, uint8_t priority, unsigned int argc, char **argv);
+void sys_createProcess(uint64_t ip, uint8_t priority, unsigned int argc, char **argv, fdPipe *customStdin, fdPipe *customStdout);
 
 void sys_exit();
 

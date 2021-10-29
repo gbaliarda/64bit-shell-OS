@@ -11,12 +11,12 @@ void loadSysNum(int64_t rax) {
   sysNum = rax;
 }
 
-int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3, int64_t arg4) {
+int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3, int64_t arg4, int64_t arg5) {
   switch (sysNum) {
     case 0:
         return read((char*) arg0, (int) arg1);
     case 1:
-        return write((uint64_t) arg0, (const char*) arg1, (uint64_t) arg2);
+        return write((char*) arg0, (uint64_t) arg1);
     case 10:
         inforeg((Registers *)arg0);
         return 1;
@@ -38,7 +38,7 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
         memStatus((uint32_t *) arg0);
         return 1;
     case 17:
-        createProcess((uint64_t) arg0, (uint8_t) arg1, (uint32_t) arg2, (char **) arg3);
+        createProcess((uint64_t) arg0, (uint8_t) arg1, (uint32_t) arg2, (char **) arg3, (fdPipe *) arg4, (fdPipe *) arg5);
         return 1;
     case 18:
         exit();
@@ -76,15 +76,15 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
     case 31:
         return pipeWrite((fdPipe *) arg0, (char *) arg1);
     case 32: 
-        return pipeRead((fdPipe *) arg0, (char *) arg2);
+        return pipeRead((fdPipe *) arg0, (char *) arg2, 0);
     case 33: 
         return openPipeId((fdPipe *) arg0, (uint32_t) arg1, (uint8_t) arg2);
     case 34:
         printPipes();
         return 1;
-		case 35:
-				runScheduler();
-				return 1;
+    case 35:
+        runScheduler();
+        return 1;
     default:
       return -1;
   }

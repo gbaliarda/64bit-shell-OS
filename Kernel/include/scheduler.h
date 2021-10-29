@@ -5,6 +5,12 @@
 #include "../include/mm.h"
 #include "../include/semaphore.h"
 
+typedef struct fdPipe {
+  char readable;
+  char writable;
+  struct pipe *pipe;
+} fdPipe;
+
 typedef struct pcb {
   char *name;
   uint8_t type;
@@ -15,13 +21,15 @@ typedef struct pcb {
   uint64_t sp;
   uint64_t bp;
   uint64_t processMemory;
+  fdPipe *customStdin;
+  fdPipe *customStdout;
 } pcb;
 
 void initScheduler();
 
 uint64_t switchProcess(uint64_t sp);
 
-void createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char ** argv);
+void createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char ** argv, fdPipe *customStdin, fdPipe *customStdout);
 
 void exitCurrentProcess();
 
@@ -38,5 +46,11 @@ void waitForKeyboard();
 void awakeKeyboardQueue();
 
 pcb *blockCurrentProcess();
+
+fdPipe *getCurrentStdin();
+
+fdPipe *getCurrentStdout();
+
+uint32_t getCurrentPid();
 
 #endif

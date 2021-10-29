@@ -47,11 +47,61 @@ void p3() {
 }
  
 
-void loop(int segundos) {
+void loop(int argc, char **argv) {
 	while(1) {
 		for(int i = 0; i < 100000000; i++);
 		printf("H");
 	}
+}
+
+void cat(int argc, char **argv) {
+	printf("Cat\n");
+	sys_exit();
+}
+
+void wc(int argc, char **argv) {
+	// printf("Running WC\n");
+	char buffer[101];
+	scanf(buffer);
+	printf(buffer);
+	printf("\n");
+	sys_exit();
+}
+
+char *processList[5] = { "loop", "cat", "wc", "filter", "phylo" };
+void (*processFunc[])(int, char **) = { loop, cat, wc };
+
+void managePipe(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1], int index, int argNum) {
+	int indexP1 = -1, indexP2 = -1;
+	char *p1 = args[0];
+	char *p2 = args[index + 1];
+	fdPipe *pipeRead = sys_createFdPipe();
+	fdPipe *pipeWrite = sys_createFdPipe();
+	sys_createPipe(pipeRead, pipeWrite);
+
+	char args1[MAX_ARG_AMT][MAX_ARG_COMMAND_LEN+1];
+	char args2[MAX_ARG_AMT][MAX_ARG_COMMAND_LEN+1];
+	for (int i = 0; i < index; i++)
+		strcpy(args1[i], args[i]);
+	for (int i = 0, j = index+1; j < argNum; i++)
+		strcpy(args2[i], args[j++]);
+
+	for (int i = 0; i < 5; i++) {
+		if (compareStrings(p1, processList[i]))
+			indexP1 = i;
+		if (compareStrings(p2, processList[i]))
+			indexP2 = i;
+	}
+	if (indexP1 == -1 || indexP2 == -1) {
+		printInt(indexP1 + 1);
+		putChar('\n');
+		printInt(indexP2 + 1);
+		putChar('\n');
+		printf("Command not found, try 'help'\n");
+		return;
+	}
+	sys_createProcess((uint64_t)processFunc[indexP1], 1, index, (char **)args1, NULL, pipeWrite);
+	sys_createProcess((uint64_t)processFunc[indexP2], 2, index, (char **)args2, pipeRead, NULL);
 }
 
 void executeCommand(char * buffer) {
@@ -92,6 +142,14 @@ void executeCommand(char * buffer) {
 			index++;	
 	}
 
+	// PIPES
+	index = 1;
+	while (index < argNum - 1) {
+		if (compareStrings(args[index], "|")) {
+			managePipe(args, index, argNum);
+			return;
+		}
+	}
 
 	if (compareStrings(args[0], "help")) {
 		printf("-------COMMANDS------\n");
@@ -187,9 +245,9 @@ void executeCommand(char * buffer) {
 		printProcessorInfo(&cpuidData, maxEaxValue);
 	}
 	else if (compareStrings(args[0], "p1"))
-		sys_createProcess((uint64_t)&p1, 10, argNum, (char **)args);
+		sys_createProcess((uint64_t)&p1, 10, argNum, (char **)args, NULL, NULL);
 	else if (compareStrings(args[0], "loop")) {
-		sys_createProcess((uint64_t)&loop, 2, argNum, (char **)args);
+		sys_createProcess((uint64_t)&loop, 2, argNum, (char **)args, NULL, NULL);
 	} else if (compareStrings(args[0], "ps")) {
 		sys_printProcess();
 	} else if (compareStrings(args[0], "kill")) {
@@ -202,9 +260,15 @@ void executeCommand(char * buffer) {
 		int ok = 1;
 		sys_changeState((uint32_t) atoi(args[1], &ok));
 	} else if (compareStrings(args[0], "p2"))
-		sys_createProcess((uint64_t)&p2, 2, argNum, (char **)args);
+		sys_createProcess((uint64_t)&p2, 2, argNum, (char **)args, NULL, NULL);
 	else if (compareStrings(args[0], "p3"))
-		sys_createProcess((uint64_t)&p3, 2, argNum, (char **)args);
+		sys_createProcess((uint64_t)&p3, 2, argNum, (char **)args, NULL, NULL);
+	else if (compareStrings(args[0], "p3"))
+		sys_createProcess((uint64_t)&p3, 2, argNum, (char **)args, NULL, NULL);
+	else if (compareStrings(args[0], "cat"))
+		sys_createProcess((uint64_t)&cat, 2, argNum, (char **)args, NULL, NULL);
+	else if (compareStrings(args[0], "wc"))
+		sys_createProcess((uint64_t)&wc, 2, argNum, (char **)args, NULL, NULL);
 	else if (compareStrings(args[0], "sem"))
 		sys_printSemaphores();
 	else if (compareStrings(args[0], "pipe"))
