@@ -5,7 +5,7 @@
 #define QUANTUM 1
 #define PRIORITY_QUANTUM 5
 #define MAX_WAITING_KEYBOARD 10
-#define NULL ((void*) 0)
+#define DEFAULT_PROGRAM_SIZE 4096
 
 typedef struct ListNode {
   pcb process;
@@ -80,7 +80,7 @@ void initScheduler() {
   dummy->next = scheduler->start;
 }
 
-static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char *name) {
+static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char *name, fdPipe *customStdin, fdPipe *customStdout) {
 
   if (node == NULL) {
     ListNode *newNode = (ListNode *) alloc(sizeof(ListNode));
@@ -89,15 +89,17 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
     newNode->process.priority = priority;
     newNode->process.auxPriority = priority;
     newNode->process.sp = sp;
-    newNode->process.bp = sp;
+    newNode->process.bp = processMemory + DEFAULT_PROGRAM_SIZE - 1;
     newNode->process.processMemory = processMemory;
     newNode->process.type = 1;
     newNode->process.name = name;
+    newNode->process.customStdin = customStdin;
+    newNode->process.customStdout = customStdout;
     return newNode;
   }
 
   if (node->next != NULL && priority >= node->next->process.priority) {
-    node->next = loadProcess(node->next, pid, priority, sp, processMemory, name);
+    node->next = loadProcess(node->next, pid, priority, sp, processMemory, name, customStdin, customStdout);
     return node;
   }
 
@@ -111,17 +113,19 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   newNode->process.priority = priority;
   newNode->process.auxPriority = priority;
   newNode->process.sp = sp;
-  newNode->process.bp = sp;
+  newNode->process.bp = processMemory + DEFAULT_PROGRAM_SIZE - 1;
   newNode->process.processMemory = processMemory;
   newNode->process.type = 1;
   newNode->process.name = name;
+  newNode->process.customStdin = customStdin;
+  newNode->process.customStdout = customStdout;
   return node;
 }
 
-void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv) {
-  uint64_t processMemory = (uint64_t) alloc(size);
-	uint64_t sp = initProcess(processMemory + size, ip, argc, argv);
-  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv[0]);
+void createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char ** argv, fdPipe *customStdin, fdPipe *customStdout) {
+  uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
+	uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, argv);
+  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv[0], customStdin, customStdout);
 }
 
 uint64_t switchProcess(uint64_t sp) {
@@ -316,4 +320,16 @@ void awakeKeyboardQueue() {
 pcb *blockCurrentProcess() {
   scheduler->currentProcess->process.pstate = 0;
   return &scheduler->currentProcess->process;
+}
+
+fdPipe *getCurrentStdin() {
+  return scheduler->currentProcess->process.customStdin;
+}
+
+fdPipe *getCurrentStdout() {
+  return scheduler->currentProcess->process.customStdout;
+}
+
+uint32_t getCurrentPid() {
+  return scheduler->currentProcess->process.pid;
 }

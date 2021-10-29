@@ -1,7 +1,6 @@
 #include "../include/semaphore.h"
 #include "../include/naiveConsole.h"
 
-#define NULL ((void *) 0)
 #define PROCESS_LIMIT 10
 #define MAX_SEM 20
 

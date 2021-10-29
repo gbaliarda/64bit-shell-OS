@@ -1,7 +1,6 @@
 #include "../include/pipes.h"
 #include "../include/naiveConsole.h"
 
-#define NULL ((void *) 0)
 #define MAX_PIPES 20
 #define PIPE_SIZE 512
 
@@ -95,6 +94,9 @@ static void deletePipeFromArray(pipe *p) {
 }
 
 void closeFdPipe(fdPipe *fd) {
+  if (fd == NULL)
+    return;
+    
   if (fd->readable) {
     fd->pipe->readOpen = 0;
     if (!fd->pipe->writeOpen) {
@@ -115,21 +117,18 @@ void closeFdPipe(fdPipe *fd) {
 int pipeWrite(fdPipe *fd, char *string) {
   if (!fd->writable)
     return -1;
-  
-  if (fd->pipe->bytesToRead == PIPE_SIZE) {
-    fd->pipe->waitingProcess = blockCurrentProcess();
-    runScheduler();
-  }
 
   int i = 0;
   while (string[i]) {
+    if (fd->pipe->bytesToRead == PIPE_SIZE) {
+      fd->pipe->waitingProcess = blockCurrentProcess();
+      runScheduler();
+    }
+
     fd->pipe->data[fd->pipe->writePos++] = string[i++];
     if (fd->pipe->writePos == PIPE_SIZE)
       fd->pipe->writePos = 0;
-    if (fd->pipe->bytesToRead < PIPE_SIZE)
-      fd->pipe->bytesToRead++;
-    else
-      return -1;
+    fd->pipe->bytesToRead++;
   }
   if (fd->pipe->waitingProcess != NULL) {
     fd->pipe->waitingProcess->pstate = 1;
@@ -138,7 +137,7 @@ int pipeWrite(fdPipe *fd, char *string) {
   return i;
 }
 
-int pipeRead(fdPipe *fd, char *buffer) {
+int pipeRead(fdPipe *fd, char *buffer, int limit) {
   if (!fd->readable)
     return -1;
 
@@ -149,10 +148,15 @@ int pipeRead(fdPipe *fd, char *buffer) {
 
   int i = 0;
   while (fd->pipe->bytesToRead > 0) {
-    buffer[i++] = fd->pipe->data[fd->pipe->readPos++];
     fd->pipe->bytesToRead--;
     if (fd->pipe->readPos == PIPE_SIZE)
       fd->pipe->readPos = 0;
+    if (limit == 1) {
+      i = (int) fd->pipe->data[fd->pipe->readPos++];
+      break;
+    }
+    else
+      buffer[i++] = fd->pipe->data[fd->pipe->readPos++];
   }
 
   if (fd->pipe->waitingProcess != NULL) {

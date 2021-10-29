@@ -3,6 +3,7 @@
 #include "interrupts.h"
 #include "syscalls.h"
 #include "time.h"
+#include "../include/pipes.h"
 #include "../include/scheduler.h"
 #include "../include/lib.h"
 
@@ -13,26 +14,31 @@ Registers *backupAuxRegisters = &bAux;
 
 void loadRegisters(Registers* registers, Registers *from);
 
-int64_t write(uint64_t fd, const char* buf, uint64_t count) {
-  switch (fd) {
-    case 1:
-      for (int i = 0; i < count; i++)
-        ncPrintChar(buf[i]);
-      return count;
-
-    default:
-      return -1;
+int64_t write(char* buf, uint64_t count) {
+  fdPipe *stdout = getCurrentStdout();
+  if (!stdout) {
+    for (int i = 0; i < count; i++)
+      ncPrintChar(buf[i]);
+  } else {
+    pipeWrite(stdout, buf);
   }
+  return count;
 }
 
 int read(char* buf, int limit) {
   int count = 0;
+  unsigned char key;
+  fdPipe *stdin = getCurrentStdin();
 
   while (count < limit || limit == -1) {
-    waitForKeyboard();
-    if (ticks_elapsed() % 9 == 0)
-      displayCursor();
-		unsigned char key = getInput();
+    if (!stdin) {
+      waitForKeyboard();
+      if (ticks_elapsed() % 9 == 0)
+        displayCursor();
+      key = getInput();
+    } else {
+      key = (unsigned char) pipeRead(stdin, NULL, 1);
+    }
 
     switch (key) {
       case 0:
@@ -40,7 +46,8 @@ int read(char* buf, int limit) {
         break;
 
       case '\n':
-        ncNewline();
+        if (!stdin)
+          ncNewline();
         buf[count] = 0;
         return count;
 
@@ -69,7 +76,8 @@ int read(char* buf, int limit) {
         if (count < 100)
           buf[count] = key;
         count++;
-        ncPrintChar(key);
+        if (!stdin)
+          ncPrintChar(key);
         break;
     }
 	}
@@ -123,6 +131,8 @@ void clearScreen() {
 }
 
 void exit() {
+  closeFdPipe(getCurrentStdin());
+  closeFdPipe(getCurrentStdout());
   exitCurrentProcess();
   runScheduler();
 }

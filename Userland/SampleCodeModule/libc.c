@@ -8,11 +8,11 @@ static int strlen(const char *str) {
 }
 
 void printf(const char *str) {
-  sys_write(1, str, strlen(str));
+  sys_write(str, strlen(str));
 }
 
 void putChar(char c) {
-  sys_write(1, &c, 1);
+  sys_write(&c, 1);
 }
 
 int scanf(char *buffer) {
@@ -54,7 +54,7 @@ static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base)
 void printInt(unsigned int num) {
   char buffer[10];
   int digits = uintToBase(num, buffer, 10);
-  sys_write(1, buffer, digits);
+  sys_write(buffer, digits);
 }
 
 void printReg(const char *regName, uint64_t regValue) {
@@ -239,4 +239,20 @@ int cpuid(cpuInformation* cpuidData) {
   cpuidData->avx2 = (cpuidRegister.ebx & 0x00000020) >> 5;
 
   return maxEaxValue;
+}
+
+char* strcpy(char* destination, const char* source) {
+  if (destination == NULL)
+    return NULL;
+
+  char *ptr = destination;
+
+  while (*source != '\0') {
+    *destination = *source;
+    destination++;
+    source++;
+  }
+
+  *destination = '\0';
+  return ptr;
 }
