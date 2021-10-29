@@ -76,7 +76,7 @@ int main() {
 	initScheduler();
 	char argv[1][10] = {"Shell"};
 	argv[0][5] = 0;
-	createProcess((uint64_t)sampleCodeModuleAddress, 2048, 1, 1, (char **) argv);
+	createProcess((uint64_t)sampleCodeModuleAddress, 1, 1, (char **) argv);
 
 	ncClear();
 

@@ -6,6 +6,7 @@
 #define PRIORITY_QUANTUM 5
 #define MAX_WAITING_KEYBOARD 10
 #define NULL ((void*) 0)
+#define DEFAULT_PROGRAM_SIZE 4096
 
 typedef struct ListNode {
   pcb process;
@@ -118,9 +119,9 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   return node;
 }
 
-void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv) {
-  uint64_t processMemory = (uint64_t) alloc(size);
-	uint64_t sp = initProcess(processMemory + size, ip, argc, argv);
+void createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char ** argv) {
+  uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
+	uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, argv);
   scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv[0]);
 }
 

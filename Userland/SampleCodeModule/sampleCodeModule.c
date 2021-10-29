@@ -187,9 +187,9 @@ void executeCommand(char * buffer) {
 		printProcessorInfo(&cpuidData, maxEaxValue);
 	}
 	else if (compareStrings(args[0], "p1"))
-		sys_createProcess((uint64_t)&p1, 1024, 10, argNum, (char **)args);
+		sys_createProcess((uint64_t)&p1, 10, argNum, (char **)args);
 	else if (compareStrings(args[0], "loop")) {
-		sys_createProcess((uint64_t)&loop, 1024, 2, argNum, (char **)args);
+		sys_createProcess((uint64_t)&loop, 2, argNum, (char **)args);
 	} else if (compareStrings(args[0], "ps")) {
 		sys_printProcess();
 	} else if (compareStrings(args[0], "kill")) {
@@ -202,9 +202,9 @@ void executeCommand(char * buffer) {
 		int ok = 1;
 		sys_changeState((uint32_t) atoi(args[1], &ok));
 	} else if (compareStrings(args[0], "p2"))
-		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, (char **)args);
+		sys_createProcess((uint64_t)&p2, 2, argNum, (char **)args);
 	else if (compareStrings(args[0], "p3"))
-		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
+		sys_createProcess((uint64_t)&p3, 2, argNum, (char **)args);
 	else if (compareStrings(args[0], "sem"))
 		sys_printSemaphores();
 	else if (compareStrings(args[0], "pipe"))
