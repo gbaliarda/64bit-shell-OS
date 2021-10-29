@@ -3,7 +3,7 @@
 #include "./apps.h"
 
 char *processList[5] = { "loop", "cat", "wc", "filter", "phylo" };
-void (*processFunc[])(int, char **) = { loop, cat, wc };
+void (*processFunc[])(int argc, const char *argv[]) = { loop, cat, wc, filter };
 
 static int strlen(const char *str) {
   int len = 0;
@@ -274,7 +274,7 @@ void createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *cus
   int argsIndex = 0;
   for (int i = 0; i < argc; i++) {
     int j = 0;
-    while (argv[i][j]) 
+    while (argv[i][j])
       args[argsIndex++] = argv[i][j++];
     args[argsIndex++] = 0;
   }
@@ -372,8 +372,9 @@ static void managePipe(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1], int inde
 
 	char args1[MAX_ARG_AMT][MAX_ARG_COMMAND_LEN+1];
 	char args2[MAX_ARG_AMT][MAX_ARG_COMMAND_LEN+1];
-	for (int i = 0; i < index; i++)
+	for (int i = 0; i < index; i++) {
 		strcpy(args1[i], args[i]);
+	}
 	for (int i = 0, j = index+1; j < argNum; i++)
 		strcpy(args2[i], args[j++]);
 
@@ -383,12 +384,14 @@ static void managePipe(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1], int inde
 		if (compareStrings(p2, processList[i]))
 			indexP2 = i;
 	}
+
 	if (indexP1 == -1 || indexP2 == -1) {
 		printf("Command not found, try 'help'\n");
 		return;
 	}
+
 	createProcess((uint64_t)processFunc[indexP1], index, args1, NULL, pipeWrite);
-	createProcess((uint64_t)processFunc[indexP2], index, args2, pipeRead, NULL);
+	createProcess((uint64_t)processFunc[indexP2], argNum-index-1, args2, pipeRead, NULL);
 }
 
 void executeCommand(char * buffer) {
@@ -436,6 +439,7 @@ void executeCommand(char * buffer) {
 			managePipe(args, index, argNum);
 			return;
 		}
+		index++;
 	}
 
 	if (compareStrings(args[0], "help")) {

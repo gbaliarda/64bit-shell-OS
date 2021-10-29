@@ -119,6 +119,7 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   newNode->process.args = args;
   newNode->process.customStdin = customStdin;
   newNode->process.customStdout = customStdout;
+
   return node;
 }
 
@@ -126,8 +127,10 @@ void createProcess(uint64_t ip,uint8_t priority, uint64_t argc, char **argv, fdP
   if(priority == 1 && pid > 1)
     scheduler->fgTaken = 1;
 
+
   uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
 	uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, argv);
+
   scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv, customStdin, customStdout);
 }
 

@@ -74,13 +74,7 @@ int main() {
 
 	// Creamos el primer proceso a mano
 	initScheduler();
-<<<<<<< HEAD
-	char argv[1][10] = {"Shell"};
-	argv[0][5] = 0;
-	createProcess((uint64_t)sampleCodeModuleAddress, 1, 1, (char **) argv, NULL, NULL);
-=======
-	createProcessWrapper((uint64_t)sampleCodeModuleAddress, 4096, 1, 1, "Shell");
->>>>>>> argv+fg+commands
+	createProcessWrapper((uint64_t)sampleCodeModuleAddress, 1, 1, "Shell", NULL, NULL);
 
 	ncClear();
 

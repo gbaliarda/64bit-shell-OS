@@ -4,14 +4,11 @@
 
 void cat(int argc, const char* argv[]) {
 	char buffer[200];
-	while(1) {
-		int n = scanf(buffer);
-		if(n > 0) {
-			printf(buffer);
-			printf("\n");
-		}
+	while(scanf(buffer) > 0) {
+		printf(buffer);
+		printf("\n");
 	}
-	sys_exit();
+	sys_exit(); 
 }
 
 void wc(int argc, const char *argv[]) {
@@ -20,8 +17,7 @@ void wc(int argc, const char *argv[]) {
 
 void filter(int argc, const char *argv[]) {
 	char buffer[200];
-  while(1) {
-    int n = scanf(buffer);
+  while(scanf(buffer) >= 0) {
     int i = 0;
 		while (buffer[i]) {
 			switch (buffer[i]) {
@@ -85,7 +81,7 @@ void p3(int argc, const char* argv[]) {
 	sys_exit();
 }
 
-void p4() {
+void p4(int argc, const char* argv[]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Soy p4 y hora de esperar!\n");
 	sys_semWait(sem);
@@ -93,7 +89,7 @@ void p4() {
 	sys_exit();
 }
 
-void p5() {
+void p5(int argc, const char* argv[]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Voy a despertar a p4!\n");
 	sys_semPost(sem);
@@ -110,12 +106,12 @@ void loop(int argc, const char* argv[]) {
 }
 
 
-// void cat(int argc, char **argv) {
+// void cat(int argc, const char* argv[]) {
 // 	printf("Cat\n");
 // 	sys_exit();
 // }
 
-// void wc(int argc, char **argv) {
+// void wc(int argc, const char* argv[]) {
 // 	// printf("Running WC\n");
 // 	char buffer[101];
 // 	scanf(buffer);

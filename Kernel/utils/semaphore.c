@@ -17,10 +17,9 @@ uint32_t size = 0;
 uint8_t mutexSem = 0;  // open y close sem de forma bloqueante
 
 Semaphore *sem_open(uint32_t id, int value) {
-
   while(_xchg(&mutexSem, 1) != 0);
 
-  if (size == MAX_SEM)
+  if (size == MAX_SEM || value < 0)
     return NULL;
 
   int semIterator = 0;
@@ -42,6 +41,8 @@ Semaphore *sem_open(uint32_t id, int value) {
 }
 
 int sem_close(Semaphore *sem) {
+  if (sem->waiting > 0)
+    return -1;
 
   while(_xchg(&mutexSem, 1) != 0);
 
@@ -66,16 +67,16 @@ int sem_close(Semaphore *sem) {
 int sem_wait(Semaphore *sem) {
   while (_xchg(&sem->lock, 1) != 0);  
   
-  if (sem->value <= 0) {
+  if (sem->value == 0) {
     if(sem->waiting == PROCESS_LIMIT)
       return -1;
-    
-    sem->value--;
+
     sem->queue[sem->waiting++] = blockCurrentProcess();
     _xchg(&sem->lock, 0);
     runScheduler();
-  } else
-   sem->value--; 
+  }
+  
+  sem->value--; 
 
   _xchg(&sem->lock, 0);
   return 0;
@@ -86,9 +87,10 @@ int sem_post(Semaphore *sem) {
 
   sem->value++;
 
-  if(sem->value < 0 || sem->waiting == 0)
+  if(sem->waiting == 0) {
     _xchg(&sem->lock, 0);
     return 0;
+  }
   
   sem->queue[0]->pstate = 1;
   sem->waiting--;

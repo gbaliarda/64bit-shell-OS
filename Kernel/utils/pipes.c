@@ -96,18 +96,25 @@ static void deletePipeFromArray(pipe *p) {
 void closeFdPipe(fdPipe *fd) {
   if (fd == NULL)
     return;
-    
+  
+
   if (fd->readable) {
     fd->pipe->readOpen = 0;
     if (!fd->pipe->writeOpen) {
       deletePipeFromArray(fd->pipe);
       free(fd->pipe);
+    } else if (fd->pipe->waitingProcess != NULL) {
+        fd->pipe->waitingProcess->pstate = 1;
+        fd->pipe->waitingProcess = NULL;
     }
   } else if (fd->writable) {
     fd->pipe->writeOpen = 0;
     if (!fd->pipe->readOpen) {
       deletePipeFromArray(fd->pipe);
       free(fd->pipe);
+    } else if (fd->pipe->waitingProcess != NULL) {
+        fd->pipe->waitingProcess->pstate = 1;
+        fd->pipe->waitingProcess = NULL;
     }
   }
 
@@ -115,7 +122,7 @@ void closeFdPipe(fdPipe *fd) {
 }
 
 int pipeWrite(fdPipe *fd, char *string) {
-  if (!fd->writable)
+  if (!fd->writable || (!fd->pipe->readOpen && fd->pipe->bytesToRead == PIPE_SIZE))
     return -1;
 
   int i = 0;
@@ -138,8 +145,10 @@ int pipeWrite(fdPipe *fd, char *string) {
 }
 
 int pipeRead(fdPipe *fd, char *buffer, int limit) {
-  if (!fd->readable)
+  ncPrint("");
+  if (!fd->readable || (!fd->pipe->writeOpen && fd->pipe->bytesToRead == 0)) {
     return -1;
+  }
 
   if (fd->pipe->bytesToRead == 0) {
     fd->pipe->waitingProcess = blockCurrentProcess();
