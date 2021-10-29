@@ -45,6 +45,22 @@ void p3() {
 	printf("\n");
 	sys_exit();
 }
+
+void p4() {
+	Semaphore *sem = sys_semOpen(1, 0);
+	printf("Soy p4 y hora de esperar!\n");
+	sys_semWait(sem);
+	printf("Soy p4 y me canse de esperar >:(\n");
+	sys_exit();
+}
+
+void p5() {
+	Semaphore *sem = sys_semOpen(1, 0);
+	printf("Voy a despertar a p4!\n");
+	sys_semPost(sem);
+	printf("Desperte a p4! :D\n");
+	sys_exit();
+}
  
 
 void loop(int segundos) {
@@ -205,6 +221,10 @@ void executeCommand(char * buffer) {
 		sys_createProcess((uint64_t)&p2, 1024, 2, argNum, (char **)args);
 	else if (compareStrings(args[0], "p3"))
 		sys_createProcess((uint64_t)&p3, 1024, 2, argNum, (char **)args);
+	else if (compareStrings(args[0], "p4"))
+		sys_createProcess((uint64_t)&p4, 2048, 2, argNum, (char **)args);
+	else if (compareStrings(args[0], "p5"))
+		sys_createProcess((uint64_t)&p5, 2048, 2, argNum, (char **)args);
 	else if (compareStrings(args[0], "sem"))
 		sys_printSemaphores();
 	else if (compareStrings(args[0], "pipe"))

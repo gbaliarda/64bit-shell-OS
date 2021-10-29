@@ -17,4 +17,6 @@ void printSemaphores();
 
 void deleteProcessFromSemaphores(uint32_t pid);
 
+extern uint8_t _xchg(uint8_t *lock, int value); 
+
 #endif
