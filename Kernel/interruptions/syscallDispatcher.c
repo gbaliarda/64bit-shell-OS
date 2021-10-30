@@ -38,8 +38,7 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
         memStatus((uint32_t *) arg0);
         return 1;
     case 17:
-        createProcess((uint64_t) arg0, (uint32_t) arg1, (uint8_t) arg2, (uint32_t) arg3, (char **) arg4);
-        return 1;
+        return createProcess((uint64_t) arg0, (uint32_t) arg1, (uint8_t) arg2, (uint32_t) arg3, (char **) arg4);
     case 18:
         exit();
         return 1;

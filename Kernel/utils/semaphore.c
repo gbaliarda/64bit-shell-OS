@@ -15,11 +15,11 @@ typedef struct Semaphore {
 
 Semaphore *semaphores[MAX_SEM];
 uint32_t size = 0;
-uint8_t mutexSem = 0;  // open y close sem de forma bloqueante
+uint8_t mutex = 0;  // open y close sem de forma bloqueante
 
 Semaphore *sem_open(uint32_t id, int value) {
 
-  while(_xchg(&mutexSem, 1) != 0);
+  while(_xchg(&mutex, 1) != 0);
 
   if (size == MAX_SEM)
     return NULL;
@@ -34,24 +34,24 @@ Semaphore *sem_open(uint32_t id, int value) {
     semaphores[size]->value = value;
     semaphores[size]->waiting = 0;
     semaphores[size]->lock = 0;  // Inicialmente esta desbloqueado
-    _xchg(&mutexSem, 0);
+    _xchg(&mutex, 0);
     return semaphores[size++];
   }
 
-  _xchg(&mutexSem, 0);
+  _xchg(&mutex, 0);
   return semaphores[semIterator];
 }
 
 int sem_close(Semaphore *sem) {
 
-  while(_xchg(&mutexSem, 1) != 0);
+  while(_xchg(&mutex, 1) != 0);
 
   int semIterator = 0;
   while (semIterator < size && sem->id != semaphores[semIterator]->id)
     semIterator++;
 
   if(semIterator == size)
-    _xchg(&mutexSem, 0);
+    _xchg(&mutex, 0);
     return -1;
   
   while(semIterator < size-1)
@@ -60,7 +60,7 @@ int sem_close(Semaphore *sem) {
 
   free(sem);
 
-  _xchg(&mutexSem, 0);
+  _xchg(&mutex, 0);
   return 0;
 }
 

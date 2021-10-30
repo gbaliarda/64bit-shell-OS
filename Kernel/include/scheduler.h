@@ -21,7 +21,7 @@ void initScheduler();
 
 uint64_t switchProcess(uint64_t sp);
 
-void createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv);
+uint32_t createProcess(uint64_t ip, uint32_t size, uint8_t priority, uint64_t argc, char ** argv);
 
 void exitCurrentProcess();
 
