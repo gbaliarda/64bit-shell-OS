@@ -28,9 +28,9 @@ void initScheduler();
 
 uint64_t switchProcess(uint64_t sp);
 
-void createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char **argv, fdPipe *customStdin, fdPipe *customStdout);
+int createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char **argv, fdPipe *customStdin, fdPipe *customStdout);
 
-void createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout);
+int createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout);
 
 void exitCurrentProcess();
 

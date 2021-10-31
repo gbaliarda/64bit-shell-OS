@@ -3,7 +3,7 @@
 #include "syscalls.h"
 
 #define MAX_PH 15
-#define MIN_PH 2
+#define MIN_PH 1
 #define INIT_PH 5
 #define EAT_TIME 3
 
@@ -51,27 +51,32 @@ Semaphore *philoSem[MAX_PH];
 
 //Agrego filosofo a la mesa y agrego un chopstick (sem)
 static int addPh(int index) {
+  printInt(amountPh);
+  printf("\n");
   //Error
-  if(index < MIN_PH -1 || index >= MAX_PH)
+  if(index >= MAX_PH)
     return -1;
 
   
   sys_semWait(mutex);
 
-  amountPh++;
   //Agrego a la lista de los filosofos
   philos[index].state = THINKING;
   //Agrego un nuevo chopstick como recurso por la llegada de un nuevo filosofo
   philoSem[index] = sys_semOpen(index, 1);
 
   char seat[3];
-  uintToBase(index, seat, 3);
+  uintToBase(index, seat, 10);
   char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1];
   strcpy(argv[0], "philo");
   strcpy(argv[1], seat);
-  createProcess((uint64_t)&philoProcess, 2, argv, NULL, NULL);
-  philos[index].pid = sys_getpid();
+  strcpy(argv[2], "&");
+  
+  philos[index].pid = createProcess((uint64_t)&philoProcess, 3, argv, NULL, NULL);
+  amountPh++;
+  executeCommand("ps");
   sys_semPost(mutex);
+  
 
   return 0;
 }
@@ -80,7 +85,6 @@ static int addPh(int index) {
 static void philoProcess(int argc, char  *argv[]) {
   int ok = 1;
   int seat = atoi(argv[1], &ok);
-
   while (1)
   {
     takeChopsticks(seat);
@@ -117,12 +121,12 @@ static void putChopsticks(int index) {
 
 // No esta definido wait creo (esta en time.c la que quiero usar)
 static void eat() {
-  //wait((double)EAT_TIME);
+  sys_sleep(EAT_TIME);
 }
 
 static void checkAvailability(int index) {
   // Veo si los dos filosofos de al lado no quieren comer 
-  if(philos[index].state == HUNGRY && philos[left(index)].state == THINKING &&  philos[right(index)].state == THINKING) {
+  if(philos[index].state == HUNGRY && philos[left(index)].state != EATING &&  philos[right(index)].state != EATING) {
     philos[index].state = EATING;
     printTable();
 
@@ -133,24 +137,32 @@ static void checkAvailability(int index) {
 }
 
 static int left(int index) {
-  return (index + 1) % amountPh;
+  return (index == 0) ? amountPh - 1 : index - 1;
 }
 
 static int right(int index) {
-  return ((index == 0 ? amountPh -1 : index -1));
+  return (index == amountPh -1) ? 0 : index + 1;
 }
 
 
 static int deletePh(int index) {
+  if(index < MIN_PH-1)
+    return -1;
+
   sys_semWait(mutex);
 
-  amountPh--;
   int eating = (philos[index].state == EATING);
 
-  if (sys_semClose(philoSem[index]) == -1)
+  if (sys_semClose(philoSem[index]) == -1) {
     printf("Error closing philo's sem");
+    return -1;
+  }
   //Validar el kill ?
   sys_killProcess(philos[index].pid);
+  amountPh--;
+
+  printInt(amountPh);
+  printf("\n");
 
   // Como siempre es el ultimo si llego a comer y justo lo cerramos tenemos que actualizar la fila avisandole al anteultimo y al primero
   if(eating) {
@@ -188,14 +200,11 @@ void philo(int argc, const char *argv[]) {
   mutex = sys_semOpen(15, 1);
 
   amountPh = 0;
-  for (int i = 0; i < MIN_PH; i++)
-  {
-    if (addPh(i) == -1)
-      printf("Error crear filosofo!\n");
-  }
+  // executeCommand("ps");
 
-  printf(" 'a' para agregar - 'q' para remover filosofos - 'q' para salir");
+  printf(" 'a' para agregar - 'r' para remover filosofos - 'q' para salir\n");
   char c[1];
+  executeCommand("ps");
   while( getChar(c) != 0 ) 
   {
     switch (c[0])
@@ -203,18 +212,19 @@ void philo(int argc, const char *argv[]) {
     case 'a':
     case 'A':
       if(addPh(amountPh) == -1)
-        printf("Error agregando filosofo");
+        printf("Error agregando filosofo\n");
       break;
     case 'r':
     case 'R':
       if(deletePh(amountPh - 1) == -1)
-        printf("Error borrando filosofo");
+        printf("Error borrando filosofo\n");
       break;
     case 'q':
     case 'Q':
       endDining();
-    
-    return;
     }
+    putChar(c[0]);
   }
+  printf("por exitear");
+  sys_exit();
 }

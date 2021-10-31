@@ -51,8 +51,6 @@ void timer_handler() {
   TimerNode *prev = start;
   while (iterator != NULL) {
     if ((ticks_elapsed() - iterator->initialTicks) / 18 >= iterator->seconds) {
-      ncPrint("Despertando a: ");
-      ncPrintDec(iterator->process->pid);
       iterator->process->pstate = 1;
       if (iterator->process->pid == prev->process->pid) {
         free(start);
@@ -80,5 +78,6 @@ int seconds_elapsed() {
 void sleep(uint32_t seconds) {
   addToQueue(seconds);
   blockCurrentProcess();
+  ncPrint(" ");
   runScheduler();
 }

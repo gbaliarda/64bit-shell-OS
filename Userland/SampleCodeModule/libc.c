@@ -28,8 +28,7 @@ int getChar(char *buffer) {
   return sys_read(buffer, 1);
 }
 
-static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base)
-{
+uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base) {
 	char *p = buffer;
 	char *p1, *p2;
 	uint32_t digits = 0;
@@ -262,7 +261,7 @@ char* strcpy(char* destination, const char* source) {
   return ptr;
 }
 
-void createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout) {
+int createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout) {
   uint8_t priority = 3;
 	if (customStdin == NULL) {
 		priority = (compareStrings("&", argv[argc-1]) ? 3 : 1);
@@ -278,8 +277,10 @@ void createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *cus
       args[argsIndex++] = argv[i][j++];
     args[argsIndex++] = 0;
   }
-  sys_createProcess(ip, priority, argc, args, customStdin, customStdout);
+
+  int aux = sys_createProcess(ip, priority, argc, args, customStdin, customStdout);
   sys_free(args);
+	return aux;
 }
 
 static void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
@@ -567,6 +568,9 @@ void executeCommand(char * buffer) {
 	}
 	else if (compareStrings(args[0], "filter")) {
 		createProcess((uint64_t)&filter, argNum, args, NULL, NULL);
+	}
+	else if (compareStrings(args[0], "phylo")) {
+		createProcess((uint64_t)&philo, argNum, args, NULL, NULL);
 	}
 	else if (compareStrings(args[0], "mem")) {
 		unsigned int mem[3];

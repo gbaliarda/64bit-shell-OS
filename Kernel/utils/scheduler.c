@@ -123,7 +123,7 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   return node;
 }
 
-void createProcess(uint64_t ip,uint8_t priority, uint64_t argc, char **argv, fdPipe *customStdin, fdPipe *customStdout) {
+int createProcess(uint64_t ip,uint8_t priority, uint64_t argc, char **argv, fdPipe *customStdin, fdPipe *customStdout) {
   if(priority == 1 && pid > 1)
     scheduler->fgTaken = 1;
 
@@ -131,23 +131,29 @@ void createProcess(uint64_t ip,uint8_t priority, uint64_t argc, char **argv, fdP
   uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
 	uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, argv);
 
+  int pidAux = pid;
   scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv, customStdin, customStdout);
+  return pidAux;
 }
 
-void createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout) {
-	char **args = (char **) alloc(argc*21);
-	int j = 0;
+int createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout) {
+  char **args = (char **) alloc(argc*21);
+  args[0] = (char *)args;
+  int j = 0;
   for (int i = 0; i < argc; i++) {
     int k = 0;
     if(i != 0) {
-      args[i] = (char * )((uint64_t)args[0]+j);
+      args[i] = (char *)((uint64_t)args[0]+j);
     }
-    while(argv[j]) 
-        args[i][k++] = argv[j++];
+    while(argv[j]) {
+      args[i][k] = argv[j];
+      k++;
+      j++;
+    }
     args[i][k] = 0;
     j++;
   }
-  createProcess(ip, priority, argc, args, customStdin, customStdout);
+  return createProcess(ip, priority, argc, args, customStdin, customStdout);
 }
 
 uint64_t switchProcess(uint64_t sp) {
@@ -267,7 +273,8 @@ void printProcessList() {
   ncPrint("Name    PID    Priority     SP       BP     Type        State\n");
   ListNode *aux = scheduler->start;
   while(aux != NULL) {
-    aux->process.pid == 1 ? ncPrint("Shell") : ncPrint(aux->process.args[0]);
+    // aux->process.pid == 1 ? ncPrint("Shell") : ncPrint(aux->process.args[0]);
+    ncPrint(aux->process.args[0]);
     ncPrint("     ");
     ncPrintDec(aux->process.pid);
     ncPrint("     ");

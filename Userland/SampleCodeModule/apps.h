@@ -1,6 +1,8 @@
 #ifndef APPS_H
 #define APPS_H
 
+#include "philo.h"
+
 void cat(int argc, const char* argv[]);
 
 void wc(int argc, const char *argv[]);
