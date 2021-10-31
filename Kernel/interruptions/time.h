@@ -4,7 +4,7 @@
 void timer_handler();
 int ticks_elapsed();
 int seconds_elapsed();
-void wait(double seconds);
+void sleep(unsigned int seconds);
 void _hlt();
 
 #endif
