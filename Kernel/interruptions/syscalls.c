@@ -67,8 +67,12 @@ int read(char* buf, int limit) {
         loadRegisters(backupRegisters, backupAuxRegisters);
         break;
 
-      case 18:
+      case 18: // F2
         exit();
+        break;
+
+      case 19: // F3
+        return -1;
         break;
 
       // shifts izq, der y sus release; y bloq mayus

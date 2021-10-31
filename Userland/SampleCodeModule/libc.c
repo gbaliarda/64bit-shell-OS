@@ -3,7 +3,7 @@
 #include "./apps.h"
 
 char *processList[5] = { "loop", "cat", "wc", "filter", "phylo" };
-void (*processFunc[])(int argc, const char *argv[]) = { loop, cat, wc, filter };
+void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter };
 
 static int strlen(const char *str) {
   int len = 0;
@@ -571,6 +571,9 @@ void executeCommand(char * buffer) {
 	}
 	else if (compareStrings(args[0], "phylo")) {
 		createProcess((uint64_t)&philo, argNum, args, NULL, NULL);
+	}
+	else if (compareStrings(args[0], "wc")) {
+		createProcess((uint64_t)&wc, argNum, args, NULL, NULL);
 	}
 	else if (compareStrings(args[0], "mem")) {
 		unsigned int mem[3];
