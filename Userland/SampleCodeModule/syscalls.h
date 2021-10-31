@@ -59,7 +59,7 @@ void sys_printPipes();
 
 void sys_yield();
 
-int sys_getPid();
+uint32_t sys_getPid();
 
 void sys_sleep(unsigned int seconds);
 

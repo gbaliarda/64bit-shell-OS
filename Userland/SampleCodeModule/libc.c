@@ -112,7 +112,8 @@ uint64_t atoi(char *str, int *ok){
   
   for (int i = 0; str[i]; ++i) {
     if(str[i] < '0' || str[i] > '9') {
-      *ok = 0;
+			if (ok != NULL)
+      	*ok = 0;
       return 0;
     }
     else
