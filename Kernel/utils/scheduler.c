@@ -1,6 +1,7 @@
 #include "../include/scheduler.h"
 #include "../include/naiveConsole.h"
 #include "../interruptions/interrupts.h"
+#include "../interruptions/time.h"
 
 #define QUANTUM 1
 #define PRIORITY_QUANTUM 5
@@ -39,6 +40,8 @@ WaitingKeyboardList *waitingKeyboardList;
 
 static void dummyProcess() {
   while(1) {
+    if (ticks_elapsed() % 9 == 0)
+      displayCursor();
     _hlt();
   }
 }

@@ -38,8 +38,6 @@ int read(char* buf, int limit) {
   while (count < limit || limit == -1) {
     if (!stdin) {
       waitForKeyboard();
-      if (ticks_elapsed() % 9 == 0)
-        displayCursor();
       key = getInput();
     } else {
       key = (unsigned char) pipeRead(stdin, NULL, 1);
