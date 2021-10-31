@@ -50,9 +50,10 @@ int sem_close(Semaphore *sem) {
   while (semIterator < size && sem->id != semaphores[semIterator]->id)
     semIterator++;
 
-  if(semIterator == size)
+  if(semIterator == size) {
     _xchg(&mutexSem, 0);
     return -1;
+  }
   
   while(semIterator < size-1)
     semaphores[semIterator] = semaphores[semIterator+1];

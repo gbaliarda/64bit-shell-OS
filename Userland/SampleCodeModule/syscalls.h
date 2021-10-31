@@ -21,7 +21,7 @@ void sys_free(void *memoryToFree);
 
 void sys_memStatus(unsigned int *status);
 
-void sys_createProcess(uint64_t ip, uint8_t priority, unsigned int argc, char *argv, fdPipe *customStdin, fdPipe *customStdout);
+int sys_createProcess(uint64_t ip, uint8_t priority, unsigned int argc, char *argv, fdPipe *customStdin, fdPipe *customStdout);
 
 void sys_exit();
 
