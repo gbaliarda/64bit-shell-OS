@@ -28,7 +28,7 @@ static int deletePh(int index);
 
 static void printTable();
 
-static void philoProcess(int argc, char  *argv[]);
+static void philoProcess(int argc, const char argv[6][21]);
 
 static void takeChopsticks(int index);
 
@@ -51,12 +51,9 @@ Semaphore *philoSem[MAX_PH];
 
 //Agrego filosofo a la mesa y agrego un chopstick (sem)
 static int addPh(int index) {
-  printInt(amountPh);
-  printf("\n");
   //Error
   if(index >= MAX_PH)
     return -1;
-
   
   sys_semWait(mutex);
 
@@ -74,17 +71,14 @@ static int addPh(int index) {
   
   philos[index].pid = createProcess((uint64_t)&philoProcess, 3, argv, NULL, NULL);
   amountPh++;
-  executeCommand("ps");
   sys_semPost(mutex);
-  
-
   return 0;
 }
 
 /* proceso filosofo que busca chopsticks e intenta comer si puede, sino espera */
-static void philoProcess(int argc, char  *argv[]) {
+static void philoProcess(int argc, const char argv[6][21]) {
   int ok = 1;
-  int seat = atoi(argv[1], &ok);
+  int seat = atoi((char *)argv[1], &ok);
   while (1)
   {
     takeChopsticks(seat);
@@ -161,9 +155,6 @@ static int deletePh(int index) {
   sys_killProcess(philos[index].pid);
   amountPh--;
 
-  printInt(amountPh);
-  printf("\n");
-
   // Como siempre es el ultimo si llego a comer y justo lo cerramos tenemos que actualizar la fila avisandole al anteultimo y al primero
   if(eating) {
     checkAvailability(index - 1);
@@ -195,16 +186,14 @@ static void endDining() {
 }
 
 // Funcion que ejecuta el problema de los filosofos 
-void philo(int argc, const char *argv[]) {
+void philo(int argc, const char argv[6][21]) {
   printf("Bienvenidos al juego de los filosofos!\n");
   mutex = sys_semOpen(15, 1);
 
   amountPh = 0;
-  // executeCommand("ps");
 
   printf(" 'a' para agregar - 'r' para remover filosofos - 'q' para salir\n");
   char c[1];
-  executeCommand("ps");
   while( getChar(c) != 0 ) 
   {
     switch (c[0])
@@ -223,8 +212,7 @@ void philo(int argc, const char *argv[]) {
     case 'Q':
       endDining();
     }
-    putChar(c[0]);
   }
-  printf("por exitear");
+  sys_semClose(mutex);
   sys_exit();
 }

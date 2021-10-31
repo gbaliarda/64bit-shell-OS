@@ -2,8 +2,10 @@
 #include "./syscalls.h"
 #include "./apps.h"
 
-char *processList[5] = { "loop", "cat", "wc", "filter", "phylo" };
-void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter };
+#define PROCESS_AMOUNT 6
+
+char *processList[PROCESS_AMOUNT] = { "loop", "cat", "wc", "filter", "phylo", "p4" };
+void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter, philo, p4 };
 
 static int strlen(const char *str) {
   int len = 0;
@@ -380,7 +382,7 @@ static void managePipe(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1], int inde
 	for (int i = 0, j = index+1; j < argNum; i++)
 		strcpy(args2[i], args[j++]);
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < PROCESS_AMOUNT; i++) {
 		if (compareStrings(p1, processList[i]))
 			indexP1 = i;
 		if (compareStrings(p2, processList[i]))

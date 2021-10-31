@@ -122,18 +122,3 @@ void loop(int argc, const char argv[6][21]) {
 		sys_sleep(delay);
 	}
 }
-
-
-// void cat(int argc, const char argv[6][21]) {
-// 	printf("Cat\n");
-// 	sys_exit();
-// }
-
-// void wc(int argc, const char argv[6][21]) {
-// 	// printf("Running WC\n");
-// 	char buffer[101];
-// 	scanf(buffer);
-// 	printf(buffer);
-// 	printf("\n");
-// 	sys_exit();
-// }
