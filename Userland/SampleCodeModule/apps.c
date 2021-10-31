@@ -99,9 +99,17 @@ void p5(int argc, const char* argv[]) {
  
 
 void loop(int argc, const char* argv[]) {
+	int ok = 1;
+	int delay = atoi((char *)argv[1], &ok);
+	if (!ok) {
+		printf("Please enter a valid delay\n");
+		sys_exit();
+	}
 	while(1) {
-		for(int i = 0; i < 100000000; i++);
-		printf("H");
+		printf("Hello World! My PID is: ");
+		printInt(sys_getPid());
+		putChar('\n');
+		sys_sleep(delay);
 	}
 }
 

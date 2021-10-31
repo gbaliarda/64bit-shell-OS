@@ -28,31 +28,12 @@ void addToQueue(uint32_t seconds) {
   }
 }
 
-TimerNode *removeFromQueue(TimerNode* node, uint32_t pid) {
-  if (node == NULL)
-    return NULL;
-  
-  if (node->process->pid == pid) {
-    ncPrint("Despertando a: ");
-    ncPrintDec(node->process->pid);
-    TimerNode *aux = node->next;
-    node->process->pstate = 1;
-    free(node);
-    return aux;
-  }
-  
-  node->next = removeFromQueue(node->next, pid);
-  return node;
-}
-
 void timer_handler() {
 	ticks++;
   TimerNode *iterator = start;
   TimerNode *prev = start;
   while (iterator != NULL) {
     if ((ticks_elapsed() - iterator->initialTicks) / 18 >= iterator->seconds) {
-      ncPrint("Despertando a: ");
-      ncPrintDec(iterator->process->pid);
       iterator->process->pstate = 1;
       if (iterator->process->pid == prev->process->pid) {
         free(start);
@@ -80,5 +61,6 @@ int seconds_elapsed() {
 void sleep(uint32_t seconds) {
   addToQueue(seconds);
   blockCurrentProcess();
+  ncPrint(" ");
   runScheduler();
 }

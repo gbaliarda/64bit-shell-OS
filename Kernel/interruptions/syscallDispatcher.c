@@ -87,6 +87,8 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
     case 35:
         runScheduler();
         return 1;
+    case 36:
+        return getCurrentPid();
     case 37:
         sleep((uint32_t) arg0);
         return 1;
