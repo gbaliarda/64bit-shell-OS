@@ -14,7 +14,7 @@ void cat(int argc, const char argv[6][21]) {
 void wc(int argc, const char argv[6][21]) {
 	char buffer[200];
 	int n = 0;
-	while (scanf(buffer) >= 0)
+	while (scanf(buffer) > 0)
 		n++;
 
 	printf("Cantidad de lineas leidas: ");
@@ -25,7 +25,7 @@ void wc(int argc, const char argv[6][21]) {
 
 void filter(int argc, const char argv[6][21]) {
 	char buffer[200];
-  while(scanf(buffer) >= 0) {
+  while(scanf(buffer) > 0) {
     int i = 0;
 		while (buffer[i]) {
 			switch (buffer[i]) {
