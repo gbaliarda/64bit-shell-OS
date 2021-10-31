@@ -59,4 +59,6 @@ void sys_printPipes();
 
 void sys_yield();
 
+void sys_sleep(unsigned int seconds);
+
 #endif

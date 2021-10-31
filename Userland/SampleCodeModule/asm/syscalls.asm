@@ -26,6 +26,7 @@ GLOBAL sys_pipeRead
 GLOBAL sys_openPipeId
 GLOBAL sys_printPipes
 GLOBAL sys_yield
+GLOBAL sys_sleep
 
 section .text
 
@@ -165,5 +166,10 @@ sys_printPipes:
 
 sys_yield:
   mov rax, 35
+  int 80h
+  ret
+
+sys_sleep:
+  mov rax, 37
   int 80h
   ret
