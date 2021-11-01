@@ -4,6 +4,7 @@
 #define MAX_ARG_COMMAND_LEN 20
 
 #include <stdint.h>
+#include "./tests/tests.h"
 
 #define NULL ((void *)0)
 
