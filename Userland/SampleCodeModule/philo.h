@@ -1,6 +1,8 @@
 #ifndef PHILO_H
 #define PHILO_H
 
-void philo(int argc, const char argv[6][21]);
+#include "libc.h"
+
+void philo(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]);
 
 #endif

@@ -7,12 +7,6 @@ void sys_write(const char *buffer, unsigned int count);
 
 int sys_read(char *buffer, int limit);
 
-void sys_inforeg();
-
-void sys_printmem(uint64_t pointer);
-
-void sys_getDateTime(Time *dateTime);
-
 void sys_clearScreen();
 
 void *sys_alloc(unsigned int memoryToAllocate);

@@ -1,12 +1,6 @@
-#include "./libc.h"
+#include "./apps.h"
 
-int main() {
-	char buffer[101];
-
-	while (1) {
-		printf("> ");
-		scanf(buffer);
-		executeCommand(buffer);
-	}						
+int main(int argc, const char argv[6][21]) {
+	shell(argc, argv);				
 	return 0; 
 }
