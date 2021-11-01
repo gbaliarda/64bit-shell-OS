@@ -17,4 +17,6 @@ int pipeRead(fdPipe *fd, char* buffer, int limit);
 
 void printPipes();
 
+void deleteProcessFromPipes(uint32_t pid);
+
 #endif

@@ -11,17 +11,7 @@ typedef struct fdPipe {
   struct pipe *pipe;
 } fdPipe;
 
-typedef struct args {
-  int argc;
-  char *arg1;
-  char *arg2;
-  char *arg3;
-  char *arg4;
-  char *arg5;
-} args;
-
 typedef struct pcb {
-  // char **args;
   char args[6][21];
   uint32_t pid;
   uint8_t pstate;

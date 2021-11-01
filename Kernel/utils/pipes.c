@@ -192,3 +192,9 @@ void printPipes() {
     index++;
   }
 }
+
+void deleteProcessFromPipes(uint32_t pid) {
+  for (int i = 0; i < pipeAmount; i++)
+    if (pipes[i]->waitingProcess->pid == pid)
+      pipes[i]->waitingProcess = NULL;
+}

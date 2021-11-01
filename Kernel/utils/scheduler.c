@@ -1,4 +1,4 @@
-#include "../include/scheduler.h"
+#include "../include/pipes.h"
 #include "../include/naiveConsole.h"
 #include "../interruptions/interrupts.h"
 #include "../interruptions/time.h"
@@ -264,6 +264,7 @@ static ListNode * deleteProcess(ListNode *node, uint32_t pid) {
     node->process.pstate = 2;
     ListNode *aux = node->next;
     deleteProcessFromSemaphores(pid);
+    deleteProcessFromPipes(pid);
     free((void *)node->process.processMemory);
     free((void *)node);
     return aux;
