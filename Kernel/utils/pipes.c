@@ -17,6 +17,7 @@ typedef struct pipe {
 
 pipe *pipes[MAX_PIPES];
 uint8_t pipeAmount = 0;
+uint8_t pipeIds = 0;
 
 int createPipe(fdPipe *f0, fdPipe *f1) {
   if (pipeAmount == MAX_PIPES)
@@ -28,7 +29,7 @@ int createPipe(fdPipe *f0, fdPipe *f1) {
   pipes[pipeAmount]->readOpen = 1;
   pipes[pipeAmount]->writeOpen = 1;
   pipes[pipeAmount]->bytesToRead = 0;
-  pipes[pipeAmount]->id = 0;
+  pipes[pipeAmount]->id = MAX_PIPES + pipeIds++;
   pipes[pipeAmount]->waitingProcess = NULL;
   f0->pipe = pipes[pipeAmount];
   f0->readable = 1;
@@ -41,7 +42,7 @@ int createPipe(fdPipe *f0, fdPipe *f1) {
 }
 
 int openPipeId(fdPipe *fd, uint32_t id, uint8_t reader) {
-  if (id == 0)
+  if (id >= MAX_PIPES)
     return -1;
 
   int i = 0;
