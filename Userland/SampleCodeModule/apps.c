@@ -96,7 +96,7 @@ void p4(int argc, const char argv[6][21]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Soy p4 y hora de esperar!\n");
 	sys_semWait(sem);
-	printf("Soy p4 y me canse de esperar >:(\n");
+	printf("Soy p4 y me desperte!\n");
 	sys_exit();
 }
 
@@ -104,7 +104,6 @@ void p5(int argc, const char argv[6][21]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Voy a despertar a p4!\n");
 	sys_semPost(sem);
-	printf("Desperte a p4! :D\n");
 	sys_exit();
 }
  

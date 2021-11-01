@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 void ncPrint(const char * string);
+int ncStrlen(const char *str);
 void ncPrintChar(char character);
 void ncNewline();
 void ncPrintDec(int64_t value);

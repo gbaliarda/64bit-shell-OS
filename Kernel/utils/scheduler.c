@@ -287,20 +287,21 @@ void killPid(uint32_t pid) {
 }
 
 void printProcessList() {
-  ncPrint("Name    PID    Priority     SP       BP     Type        State\n");
+  ncPrint("Name    PID    Priority     SP          BP         Type         State\n");
   ListNode *aux = scheduler->start;
   while(aux != NULL) {
     ncPrint(aux->process.args[0]);
-    ncPrint("     ");
+    for (int i = ncStrlen(aux->process.args[0]); i < 9; i++)
+      ncPrint(" ");
     ncPrintDec(aux->process.pid);
-    ncPrint("     ");
+    ncPrint("        ");
     ncPrintDec(aux->process.priority);
-    ncPrint("            ");
+    ncPrint("        ");
     ncPrintHex(aux->process.sp);
     ncPrint("     ");
     ncPrintHex(aux->process.bp);
     ncPrint("     ");
-    ncPrint(aux->process.priority == 1 ? "foreground" : "background");
+    ncPrint(aux->process.priority == 1 ? "Foreground" : "Background");
     ncPrint("     ");
     ncPrint(aux->process.pstate ? "Ready" : "Blocked");
     ncNewline();

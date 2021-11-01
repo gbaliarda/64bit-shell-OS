@@ -2,10 +2,14 @@
 #include "./syscalls.h"
 #include "./apps.h"
 
-#define PROCESS_AMOUNT 6
+#define PROCESS_QTY 10
+#define BUILTIN_QTY 14
 
-char *processList[PROCESS_AMOUNT] = { "loop", "cat", "wc", "filter", "phylo" };
-void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter, philo };
+char *processList[PROCESS_QTY] = { "p1", "p2", "p3", "p4", "p5", "loop", "cat", "wc", "filter", "phylo" };
+void (*processFunc[])(int argc, const char argv[6][21]) = { p1, p2, p3, p4, p5, loop, cat, wc, filter, philo };
+
+char *builtinList[BUILTIN_QTY] = { "help", "clear", "mem", "sem", "kill", "nice", "block", "pipe", "ps", "testmm", "testprio", "testproc", "testsync", "testnosync" };
+void (*builtinFunc[])(int argc, const char argv[6][21]) = { p1, p2, p3, p4, p5, loop, cat, wc, filter, philo };
 
 static int strlen(const char *str) {
   int len = 0;
@@ -382,7 +386,7 @@ static void managePipe(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1], int inde
 	for (int i = 0, j = index+1; j < argNum; i++)
 		strcpy(args2[i], args[j++]);
 
-	for (int i = 0; i < PROCESS_AMOUNT; i++) {
+	for (int i = 0; i < PROCESS_QTY; i++) {
 		if (compareStrings(p1, processList[i]))
 			indexP1 = i;
 		if (compareStrings(p2, processList[i]))
@@ -471,7 +475,7 @@ void executeCommand(char * buffer) {
 		printf("-------TESTS------\n");
 		printf("1: testmm\n");
 		printf("2: testprio\n");
-		printf("3: testprocesses\n");
+		printf("3: testproc\n");
 		printf("4: testsync\n");
 		printf("5: testnosync\n");
 	} 

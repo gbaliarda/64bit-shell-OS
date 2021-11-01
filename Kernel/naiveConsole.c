@@ -39,6 +39,13 @@ void scrollDown() {
 	currentVideo -= width * 2;
 }
 
+int ncStrlen(const char *str) {
+  int len = 0;
+  while (str[len] != 0)
+    len++;
+  return len;
+}
+
 void ncPrint(const char * string) {
 	int i;
 	for (i = 0; string[i] != 0; i++)

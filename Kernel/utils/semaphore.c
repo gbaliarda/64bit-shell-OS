@@ -106,14 +106,14 @@ void printSemaphores() {
   while(index < size) {
     ncPrint("ID      Value       Blocked Process\n");
     ncPrintDec(semaphores[index]->id);
-    ncPrint("       ");
+    ncPrint("         ");
     ncPrintDec(semaphores[index]->value);
-    ncPrint("             ");
+    ncPrint("               ");
     if(semaphores[index]->waiting > 0) {
       ncPrintDec(semaphores[index]->queue[0]->pid);
       ncPrint("\n");
       for(int i = 1; i < semaphores[index]->waiting; i++) {
-        ncPrint("                     ");
+        ncPrint("                          ");
         ncPrintDec(semaphores[index]->queue[i]->pid);
         ncPrint("\n");
       }

@@ -181,9 +181,9 @@ void printPipes() {
   ncPrint("ID      Bytes To Read       Blocked Process\n");
   while(index < pipeAmount) {
     ncPrintDec(pipes[index]->id);
-    ncPrint("       ");
+    ncPrint("            ");
     ncPrintDec(pipes[index]->bytesToRead);
-    ncPrint("             ");
+    ncPrint("                   ");
     if (pipes[index]->waitingProcess != NULL) {
       ncPrintDec(pipes[index]->waitingProcess->pid);
     } else {
