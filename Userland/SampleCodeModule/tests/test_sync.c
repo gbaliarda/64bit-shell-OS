@@ -34,19 +34,10 @@ static int my_sem_close(Semaphore *sem){
   return sys_semClose(sem);
 }
 
-#define TOTAL_PAIR_PROCESSES 2
+#define TOTAL_PROCESSES 5
 #define SEM_ID 50
-#define INC_TIMES 100
+#define INC_TIMES 3
 #define INC_AMOUNT 1
-
-int64_t global;  //shared memory
-
-static void slowInc(int64_t *p, int64_t inc){
-  int64_t aux = *p;
-  aux += inc;
-  sys_yield();
-  *p = aux;
-}
 
 static void inc(){
   uint64_t i;
@@ -59,15 +50,23 @@ static void inc(){
   }
   
   for (i = 0; i < INC_TIMES; i++){
-    my_sem_wait(sem);
-    slowInc(&global, INC_AMOUNT);
-    my_sem_post(sem);
+    if (my_sem_wait(sem) == -1)
+      printf("Error waiting\n");
+    printf("I am ");
+    printInt(sys_getPid());
+    printf(" entering critical zone\n");
+    sys_sleep(1);
+    printf("Exiting critical zone\n");
+    if (my_sem_post(sem) == -1)
+      printf("Error posting\n");
+    sys_sleep(1);
   }
 
-  my_sem_close(sem);
-  
-  printf("Final value: ");
-  printInt(global);
+  if (my_sem_close(sem) == -1) {
+    printf("Error closing sem: Sem in use or sem already closed\n");
+  }
+  printf("Exiting process ");
+  printInt(sys_getPid());
   printf("\n");
   sys_exit();
 }
@@ -76,11 +75,16 @@ static void ninc(){
   uint64_t i;
   
   for (i = 0; i < INC_TIMES; i++){
-    slowInc(&global, INC_AMOUNT);
+    printf("I am ");
+    printInt(sys_getPid());
+    printf(" acceding critical zone\n");
+    sys_sleep(1);
+    printf("Exiting critical zone\n");
+    sys_sleep(1);
   }
   
-  printf("Final value: ");
-  printInt(global);
+  printf("Exiting process ");
+  printInt(sys_getPid());
   printf("\n");
   sys_exit();
 }
@@ -88,12 +92,9 @@ static void ninc(){
 void test_sync(){
   uint64_t i;
 
-  global = 0;
-
   printf("CREATING PROCESSES...(WITH SEM)\n");
 
-  for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
-    my_create_process("i");
+  for(i = 0; i < TOTAL_PROCESSES; i++){
     my_create_process("i");
   }
 }
@@ -101,12 +102,9 @@ void test_sync(){
 void test_no_sync(){
   uint64_t i;
 
-  global = 0;
-
   printf("CREATING PROCESSES...(WITHOUT SEM)\n");
 
-  for(i = 0; i < TOTAL_PAIR_PROCESSES; i++){
-    my_create_process("n");
+  for(i = 0; i < TOTAL_PROCESSES; i++){
     my_create_process("n");
   }
 }
