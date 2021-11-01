@@ -4,6 +4,9 @@
 
 //TO BE INCLUDED
 static void endless_loop(){
+  printf("I'm process ");
+  printInt(sys_getPid());
+  printf("\n");
   while(1);
 }
 
@@ -56,10 +59,14 @@ void test_processes(){
       }
     }
 
+    int i;
+    for (i = 0; i < 150000000; i++); // Busy wait so processes can execute
+
     // Randomly kills, blocks or unblocks processes until every one has been killed
     while (alive > 0){
 
       for(rq = 0; rq < MAX_PROCESSES; rq++){
+        for (i = 0; i < 30000000; i++);
         action = GetUniform(2) % 2; 
 
         switch(action){
@@ -69,6 +76,8 @@ void test_processes(){
                 printf("Error killing process\n");        // TODO: Port this as required
                 return;
               }
+              printInt(p_rqs[rq].pid);
+              printf(" was killed\n");
               p_rqs[rq].state = KILLED; 
               alive--;
             }
@@ -80,6 +89,8 @@ void test_processes(){
                 printf("Error blocking process\n");       // TODO: Port this as required
                 return;
               }
+              printInt(p_rqs[rq].pid);
+              printf(" was blocked\n");
               p_rqs[rq].state = BLOCKED; 
             }
             break;
@@ -87,17 +98,22 @@ void test_processes(){
       }
 
       // Randomly unblocks processes
-      for(rq = 0; rq < MAX_PROCESSES; rq++)
+      for(rq = 0; rq < MAX_PROCESSES; rq++) {
+        for (i = 0; i < 30000000; i++);
         if (p_rqs[rq].state == BLOCKED && GetUniform(2) % 2){
           if(my_unblock(p_rqs[rq].pid) == -1){            // TODO: Port this as required
             printf("Error unblocking process\n");         // TODO: Port this as required
             return;
           }
+          printInt(p_rqs[rq].pid);
+          printf(" was unblocked\n");
           p_rqs[rq].state = READY; 
         }
-    }
+      }
 
+    }
     printf("Succeed\n");
-    sys_sleep(1);
+    executeCommand("ps");
+    sys_sleep(4);
   }
 }

@@ -26,12 +26,13 @@ void test_mm(){
   mm_rq mm_rqs[MAX_BLOCKS];
   uint8_t rq;
   uint32_t total;
-  while (1){
+  uint32_t j = 1;
+  while (j < 20){
     rq = 0;
     total = 0;
     // Request as many blocks as we can
     while(rq < MAX_BLOCKS && total < MAX_MEMORY){
-      mm_rqs[rq].size = GetUniform(MAX_MEMORY - total - 1) + 1;
+      mm_rqs[rq].size = (rq+100)*(rq+1)*j*2;
       mm_rqs[rq].address = sys_alloc(mm_rqs[rq].size); // TODO: Port this call as required
       if(mm_rqs[rq].address != NULL)
         total += mm_rqs[rq].size;
@@ -59,5 +60,8 @@ void test_mm(){
       if (mm_rqs[i].address != NULL)
         sys_free(mm_rqs[i].address);  // TODO: Port this call as required
   
+
+    j++;
+    printf("Succeed\n");
   }
 }
