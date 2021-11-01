@@ -68,7 +68,7 @@ int sem_close(Semaphore *sem) {
 int sem_wait(Semaphore *sem) {
   while (_xchg(&sem->lock, 1) != 0);  
   
-  if (sem->value == 0) {
+  while (sem->value == 0) {
     if(sem->waiting == PROCESS_LIMIT)
       return -1;
 

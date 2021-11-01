@@ -112,7 +112,7 @@ void test_processes(){
       }
 
     }
-    printf("Succeed\n");
+    printf("Succeed - restarting in 4s\n");
     sys_sleep(4);
   }
 }
