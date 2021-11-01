@@ -89,8 +89,10 @@ static void deletePipeFromArray(pipe *p) {
   if (i == pipeAmount)
     return;
   
-  while( i < pipeAmount-1)
+  while( i < pipeAmount-1) {
     pipes[i] = pipes[i+1];
+    i++;
+  }
   pipeAmount--;
 }
 
