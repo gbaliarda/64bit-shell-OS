@@ -54,10 +54,9 @@ static void insertBlockIntoFreeList(MemoryManagerADT memoryManager, MemoryBlock 
 }
 
 void *allocMem(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
+
   MemoryBlock *block, *previousBlock;
   void *blockToReturn = NULL;
-
-	// vTaskSuspendAll();
 
   if (memoryToAllocate == 0)
     return NULL;
@@ -95,8 +94,6 @@ void *allocMem(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
 
     memoryManager->freeBytesRemaining -= block->blockSize;
   }
-	
-	// ( void ) xTaskResumeAll();
 
 	return blockToReturn;
 }
@@ -111,12 +108,9 @@ void freeMem(MemoryManagerADT const memoryManager, void *block) {
   memoryToFree -= STRUCT_SIZE;
   blockToFree = (void *) memoryToFree;
 
-  // vTaskSuspendAll();
-
   insertBlockIntoFreeList(memoryManager, ((MemoryBlock *) blockToFree));
   memoryManager->freeBytesRemaining += blockToFree->blockSize;
 
-  // ( void ) xTaskResumeAll();
 }
 
 size_t heapSize() {

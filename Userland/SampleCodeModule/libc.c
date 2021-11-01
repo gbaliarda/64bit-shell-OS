@@ -578,6 +578,21 @@ void executeCommand(char * buffer) {
 	else if (compareStrings(args[0], "wc")) {
 		createProcess((uint64_t)&wc, argNum, args, NULL, NULL);
 	}
+	else if (compareStrings(args[0], "testmem")) {
+		test_mm();
+	}
+	else if (compareStrings(args[0], "testprio")) {
+		test_prio();
+	}
+	else if (compareStrings(args[0], "testprocesses")) {
+		test_processes();
+	}
+	else if (compareStrings(args[0], "testsync")) {
+		test_sync();
+	}
+	else if (compareStrings(args[0], "testnosync")) {
+		test_no_sync();
+	}
 	else if (compareStrings(args[0], "mem")) {
 		unsigned int mem[3];
 		sys_memStatus(mem);
