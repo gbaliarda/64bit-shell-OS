@@ -47,7 +47,12 @@ int read(char* buf, int limit) {
       case (unsigned char)-1:
         return -1;
       case 0:
-        continue;
+        if (!stdin)
+          continue;
+        else {
+          buf[count] = 0;
+          return count;
+        }
 
       case '\n':
         if (!stdin)

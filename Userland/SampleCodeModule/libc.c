@@ -4,8 +4,8 @@
 
 #define PROCESS_AMOUNT 6
 
-char *processList[PROCESS_AMOUNT] = { "loop", "cat", "wc", "filter", "phylo", "p4" };
-void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter, philo, p4 };
+char *processList[PROCESS_AMOUNT] = { "loop", "cat", "wc", "filter", "phylo" };
+void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter, philo };
 
 static int strlen(const char *str) {
   int len = 0;
@@ -447,7 +447,7 @@ void executeCommand(char * buffer) {
 	}
 
 	if (compareStrings(args[0], "help")) {
-		printf("-------COMMANDS------\n");
+		printf("-------BUILTIN------\n");
 		printf("1: help\n");
 		printf("2: inforeg\n");
 		printf("3: printmem\n");
@@ -460,9 +460,20 @@ void executeCommand(char * buffer) {
 		printf("10: kill\n");
 		printf("11: nice\n");
 		printf("12: block\n");
-		printf("13: loop\n");
-		printf("14: pipe\n");
-		printf("15: ps\n");
+		printf("13: pipe\n");
+		printf("14: ps\n");
+		printf("-------PROCESSES------\n");
+		printf("1: loop\n");
+		printf("2: cat\n");
+		printf("3: wc\n");
+		printf("4: filter\n");
+		printf("5: phylo\n");
+		printf("-------TESTS------\n");
+		printf("1: testmm\n");
+		printf("2: testprio\n");
+		printf("3: testprocesses\n");
+		printf("4: testsync\n");
+		printf("5: testnosync\n");
 	} 
 	else if (compareStrings(args[0], "inforeg")) {
 		Registers registers;
