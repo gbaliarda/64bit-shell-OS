@@ -58,9 +58,13 @@ int seconds_elapsed() {
 	return ticks / 18;
 }
 
+static void fakePrint(const char * string) {
+  return;
+}
+
 void sleep(uint32_t seconds) {
   addToQueue(seconds);
   blockCurrentProcess();
-  ncPrint(" ");
+  fakePrint(" "); // por alguna razon no anda sin esto
   runScheduler();
 }
