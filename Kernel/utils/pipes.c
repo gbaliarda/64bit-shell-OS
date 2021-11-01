@@ -146,11 +146,12 @@ int pipeWrite(fdPipe *fd, char *string) {
 
 int pipeRead(fdPipe *fd, char *buffer, int limit) {
   ncPrint("");
-  if (!fd->readable || (!fd->pipe->writeOpen && fd->pipe->bytesToRead == 0)) {
+  if (!fd->readable)
     return -1;
-  }
 
   if (fd->pipe->bytesToRead == 0) {
+    if (!fd->pipe->writeOpen)
+      return 0;
     fd->pipe->waitingProcess = blockCurrentProcess();
     runScheduler();
   }
@@ -191,4 +192,10 @@ void printPipes() {
     ncPrint("\n");
     index++;
   }
+}
+
+void deleteProcessFromPipes(uint32_t pid) {
+  for (int i = 0; i < pipeAmount; i++)
+    if (pipes[i]->waitingProcess->pid == pid)
+      pipes[i]->waitingProcess = NULL;
 }

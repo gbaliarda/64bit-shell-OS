@@ -12,7 +12,7 @@ typedef struct fdPipe {
 } fdPipe;
 
 typedef struct pcb {
-  char **args;
+  char args[6][21];
   uint32_t pid;
   uint8_t pstate;
   uint8_t priority;
@@ -24,13 +24,14 @@ typedef struct pcb {
   fdPipe *customStdout;
 } pcb;
 
+
 void initScheduler();
 
 uint64_t switchProcess(uint64_t sp);
 
-void createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char **argv, fdPipe *customStdin, fdPipe *customStdout);
+int createProcess(uint64_t ip, uint8_t priority, uint64_t argc, char args[6][21], fdPipe *customStdin, fdPipe *customStdout);
 
-void createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout);
+int createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout);
 
 void exitCurrentProcess();
 

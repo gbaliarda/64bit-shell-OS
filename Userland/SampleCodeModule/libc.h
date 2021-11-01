@@ -4,6 +4,7 @@
 #define MAX_ARG_COMMAND_LEN 20
 
 #include <stdint.h>
+#include "./tests/tests.h"
 
 #define NULL ((void *)0)
 
@@ -115,8 +116,10 @@ int cpuidAvailability();
 
 int getCpuLeaf();
 
-void createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout);
+int createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout);
 
 void executeCommand(char * buffer);
+
+uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base);
 
 #endif

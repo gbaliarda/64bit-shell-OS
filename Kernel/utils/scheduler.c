@@ -1,6 +1,7 @@
-#include "../include/scheduler.h"
+#include "../include/pipes.h"
 #include "../include/naiveConsole.h"
 #include "../interruptions/interrupts.h"
+#include "../interruptions/time.h"
 
 #define QUANTUM 1
 #define PRIORITY_QUANTUM 5
@@ -39,6 +40,8 @@ WaitingKeyboardList *waitingKeyboardList;
 
 static void dummyProcess() {
   while(1) {
+    if (ticks_elapsed() % 9 == 0)
+      displayCursor();
     _hlt();
   }
 }
@@ -78,11 +81,26 @@ void initScheduler() {
   dummy->process.processMemory = dummyMemory;
   dummy->process.pstate = 1;
   dummy->process.priority = 1;
-  dummy->process.args = NULL;
   dummy->next = scheduler->start;
 }
 
-static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, uint64_t sp, uint64_t processMemory, char **args, fdPipe *customStdin, fdPipe *customStdout) {
+static char* copyString(char* destination, const char* source) {
+  if (destination == NULL)
+    return NULL;
+
+  char *ptr = destination;
+
+  while (*source != '\0') {
+    *destination = *source;
+    destination++;
+    source++;
+  }
+
+  *destination = '\0';
+  return ptr;
+}
+
+static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, int argc, char args[6][21], fdPipe *customStdin, fdPipe *customStdout, uint64_t ip) {
 
   if (node == NULL) {
     ListNode *newNode = (ListNode *) alloc(sizeof(ListNode));
@@ -90,17 +108,20 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
     newNode->process.pstate = 1;
     newNode->process.priority = priority;
     newNode->process.auxPriority = priority;
+    for (int i = 0; i < argc; i++)
+      copyString(newNode->process.args[i], args[i]);
+    uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
+	  uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, newNode->process.args);
     newNode->process.sp = sp;
     newNode->process.bp = processMemory + DEFAULT_PROGRAM_SIZE - 1;
     newNode->process.processMemory = processMemory;
-    newNode->process.args = args;
     newNode->process.customStdin = customStdin;
     newNode->process.customStdout = customStdout;
     return newNode;
   }
 
   if (node->next != NULL && priority >= node->next->process.priority) {
-    node->next = loadProcess(node->next, pid, priority, sp, processMemory, args, customStdin, customStdout);
+    node->next = loadProcess(node->next, pid, priority, argc, args, customStdin, customStdout, ip);
     return node;
   }
 
@@ -113,41 +134,43 @@ static ListNode *loadProcess(ListNode * node, uint32_t pid, uint8_t priority, ui
   newNode->process.pstate = 1; // por defecto pstate = 1 = ready
   newNode->process.priority = priority;
   newNode->process.auxPriority = priority;
+  for (int i = 0; i < argc; i++)
+    copyString(newNode->process.args[i], args[i]);
+  uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
+  uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, newNode->process.args);
   newNode->process.sp = sp;
   newNode->process.bp = processMemory + DEFAULT_PROGRAM_SIZE - 1;
   newNode->process.processMemory = processMemory;
-  newNode->process.args = args;
   newNode->process.customStdin = customStdin;
   newNode->process.customStdout = customStdout;
 
   return node;
 }
 
-void createProcess(uint64_t ip,uint8_t priority, uint64_t argc, char **argv, fdPipe *customStdin, fdPipe *customStdout) {
+int createProcess(uint64_t ip,uint8_t priority, uint64_t argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout) {
   if(priority == 1 && pid > 1)
     scheduler->fgTaken = 1;
 
-
-  uint64_t processMemory = (uint64_t) alloc(DEFAULT_PROGRAM_SIZE);
-	uint64_t sp = initProcess(processMemory + DEFAULT_PROGRAM_SIZE, ip, argc, argv);
-
-  scheduler->start = loadProcess(scheduler->start, pid++, priority, sp, processMemory, argv, customStdin, customStdout);
+  scheduler->start = loadProcess(scheduler->start, pid++, priority, argc, argv, customStdin, customStdout, ip);
+  return pid-1;
 }
 
-void createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char * argv, fdPipe *customStdin, fdPipe *customStdout) {
-	char **args = (char **) alloc(argc*21);
-	int j = 0;
-  for (int i = 0; i < argc; i++) {
+int createProcessWrapper(uint64_t ip, uint8_t priority, uint64_t argc, char *argv, fdPipe *customStdin, fdPipe *customStdout) {
+  int i = 0, j = 0;
+  char args[6][21];
+  while(i < argc) {
     int k = 0;
-    if(i != 0) {
-      args[i] = (char * )((uint64_t)args[0]+j);
+    while(argv[j]) {
+      args[i][k] = argv[j];
+      j++;
+      k++;
     }
-    while(argv[j]) 
-        args[i][k++] = argv[j++];
     args[i][k] = 0;
     j++;
+    i++;
   }
-  createProcess(ip, priority, argc, args, customStdin, customStdout);
+
+  return createProcess(ip, priority, argc, args, customStdin, customStdout);
 }
 
 uint64_t switchProcess(uint64_t sp) {
@@ -241,7 +264,7 @@ static ListNode * deleteProcess(ListNode *node, uint32_t pid) {
     node->process.pstate = 2;
     ListNode *aux = node->next;
     deleteProcessFromSemaphores(pid);
-    free((void *)node->process.args);
+    deleteProcessFromPipes(pid);
     free((void *)node->process.processMemory);
     free((void *)node);
     return aux;
@@ -267,7 +290,7 @@ void printProcessList() {
   ncPrint("Name    PID    Priority     SP       BP     Type        State\n");
   ListNode *aux = scheduler->start;
   while(aux != NULL) {
-    aux->process.pid == 1 ? ncPrint("Shell") : ncPrint(aux->process.args[0]);
+    ncPrint(aux->process.args[0]);
     ncPrint("     ");
     ncPrintDec(aux->process.pid);
     ncPrint("     ");

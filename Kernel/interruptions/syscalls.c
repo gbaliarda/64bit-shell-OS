@@ -38,8 +38,6 @@ int read(char* buf, int limit) {
   while (count < limit || limit == -1) {
     if (!stdin) {
       waitForKeyboard();
-      if (ticks_elapsed() % 9 == 0)
-        displayCursor();
       key = getInput();
     } else {
       key = (unsigned char) pipeRead(stdin, NULL, 1);
@@ -49,7 +47,12 @@ int read(char* buf, int limit) {
       case (unsigned char)-1:
         return -1;
       case 0:
-        continue;
+        if (!stdin)
+          continue;
+        else {
+          buf[count] = 0;
+          return count;
+        }
 
       case '\n':
         if (!stdin)
@@ -67,8 +70,12 @@ int read(char* buf, int limit) {
         loadRegisters(backupRegisters, backupAuxRegisters);
         break;
 
-      case 18:
+      case 18: // F2
         exit();
+        break;
+
+      case 19: // F3
+        return -1;
         break;
 
       // shifts izq, der y sus release; y bloq mayus

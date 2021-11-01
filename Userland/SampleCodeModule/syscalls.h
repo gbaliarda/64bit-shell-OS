@@ -21,7 +21,7 @@ void sys_free(void *memoryToFree);
 
 void sys_memStatus(unsigned int *status);
 
-void sys_createProcess(uint64_t ip, uint8_t priority, unsigned int argc, char *argv, fdPipe *customStdin, fdPipe *customStdout);
+int sys_createProcess(uint64_t ip, uint8_t priority, unsigned int argc, char *argv, fdPipe *customStdin, fdPipe *customStdout);
 
 void sys_exit();
 
@@ -58,5 +58,9 @@ int sys_openPipeId(fdPipe *fd, uint32_t id, uint8_t reader);
 void sys_printPipes();
 
 void sys_yield();
+
+uint32_t sys_getPid();
+
+void sys_sleep(unsigned int seconds);
 
 #endif

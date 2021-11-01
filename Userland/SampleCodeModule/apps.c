@@ -2,7 +2,7 @@
 #include "./syscalls.h"
 #include "./libc.h"
 
-void cat(int argc, const char* argv[]) {
+void cat(int argc, const char argv[6][21]) {
 	char buffer[200];
 	while(scanf(buffer) > 0) {
 		printf(buffer);
@@ -11,13 +11,21 @@ void cat(int argc, const char* argv[]) {
 	sys_exit(); 
 }
 
-void wc(int argc, const char *argv[]) {
-	
+void wc(int argc, const char argv[6][21]) {
+	char buffer[200];
+	int n = 0;
+	while (scanf(buffer) > 0)
+		n++;
+
+	printf("Cantidad de lineas leidas: ");
+	printInt(n);
+	printf("\n");
+	sys_exit();
 }
 
-void filter(int argc, const char *argv[]) {
+void filter(int argc, const char argv[6][21]) {
 	char buffer[200];
-  while(scanf(buffer) >= 0) {
+  while(scanf(buffer) > 0) {
     int i = 0;
 		while (buffer[i]) {
 			switch (buffer[i]) {
@@ -42,7 +50,7 @@ void filter(int argc, const char *argv[]) {
 	sys_exit();
 }
 
-void p1(int argc, const char* argv[]) {
+void p1(int argc, const char argv[6][21]) {
 	for(int z = 0; z < 1; z++) {
 		printf("Cantidad de argumentos: "); printInt(argc);
 		for (int i = 0; i < argc; i++) {
@@ -54,7 +62,7 @@ void p1(int argc, const char* argv[]) {
 	sys_exit();
 }
 
-void p2(int argc, const char* argv[]) {
+void p2(int argc, const char argv[6][21]) {
 	fdPipe *fd = sys_createFdPipe();
 
 	sys_openPipeId(fd, 1, 0);
@@ -64,7 +72,7 @@ void p2(int argc, const char* argv[]) {
 	sys_exit();
 }
 
-void p3(int argc, const char* argv[]) {
+void p3(int argc, const char argv[6][21]) {
 	fdPipe *fd = sys_createFdPipe();
 
 	if (sys_openPipeId(fd, 1, 1) == -1) {
@@ -73,15 +81,18 @@ void p3(int argc, const char* argv[]) {
 	}
 
 	char buff[10];
-	sys_pipeRead(fd, buff);
+	int n = sys_pipeRead(fd, buff);
 	sys_closeFdPipe(fd);
+
+	if(n == -1)
+		sys_exit();
 
 	printf(buff);
 	printf("\n");
 	sys_exit();
 }
 
-void p4(int argc, const char* argv[]) {
+void p4(int argc, const char argv[6][21]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Soy p4 y hora de esperar!\n");
 	sys_semWait(sem);
@@ -89,7 +100,7 @@ void p4(int argc, const char* argv[]) {
 	sys_exit();
 }
 
-void p5(int argc, const char* argv[]) {
+void p5(int argc, const char argv[6][21]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Voy a despertar a p4!\n");
 	sys_semPost(sem);
@@ -97,25 +108,17 @@ void p5(int argc, const char* argv[]) {
 	sys_exit();
 }
  
-
-void loop(int argc, const char* argv[]) {
+void loop(int argc, const char argv[6][21]) {
+	int ok = 1;
+	int delay = atoi((char *)argv[1], &ok);
+	if (!ok) {
+		printf("Please enter a valid delay\n");
+		sys_exit();
+	}
 	while(1) {
-		for(int i = 0; i < 100000000; i++);
-		printf("H");
+		printf("Hello World! My PID is: ");
+		printInt(sys_getPid());
+		putChar('\n');
+		sys_sleep(delay);
 	}
 }
-
-
-// void cat(int argc, const char* argv[]) {
-// 	printf("Cat\n");
-// 	sys_exit();
-// }
-
-// void wc(int argc, const char* argv[]) {
-// 	// printf("Running WC\n");
-// 	char buffer[101];
-// 	scanf(buffer);
-// 	printf(buffer);
-// 	printf("\n");
-// 	sys_exit();
-// }

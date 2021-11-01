@@ -2,8 +2,10 @@
 #include "./syscalls.h"
 #include "./apps.h"
 
-char *processList[5] = { "loop", "cat", "wc", "filter", "phylo" };
-void (*processFunc[])(int argc, const char *argv[]) = { loop, cat, wc, filter };
+#define PROCESS_AMOUNT 6
+
+char *processList[PROCESS_AMOUNT] = { "loop", "cat", "wc", "filter", "phylo" };
+void (*processFunc[])(int argc, const char argv[6][21]) = { loop, cat, wc, filter, philo };
 
 static int strlen(const char *str) {
   int len = 0;
@@ -28,8 +30,7 @@ int getChar(char *buffer) {
   return sys_read(buffer, 1);
 }
 
-static uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base)
-{
+uint32_t uintToBase(uint64_t value, char *buffer, uint32_t base) {
 	char *p = buffer;
 	char *p1, *p2;
 	uint32_t digits = 0;
@@ -113,7 +114,8 @@ uint64_t atoi(char *str, int *ok){
   
   for (int i = 0; str[i]; ++i) {
     if(str[i] < '0' || str[i] > '9') {
-      *ok = 0;
+			if (ok != NULL)
+      	*ok = 0;
       return 0;
     }
     else
@@ -262,7 +264,7 @@ char* strcpy(char* destination, const char* source) {
   return ptr;
 }
 
-void createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout) {
+int createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *customStdin, fdPipe *customStdout) {
   uint8_t priority = 3;
 	if (customStdin == NULL) {
 		priority = (compareStrings("&", argv[argc-1]) ? 3 : 1);
@@ -278,8 +280,10 @@ void createProcess(uint64_t ip, unsigned int argc, char argv[6][21], fdPipe *cus
       args[argsIndex++] = argv[i][j++];
     args[argsIndex++] = 0;
   }
-  sys_createProcess(ip, priority, argc, args, customStdin, customStdout);
+
+  int aux = sys_createProcess(ip, priority, argc, args, customStdin, customStdout);
   sys_free(args);
+	return aux;
 }
 
 static void printProcessorInfo(cpuInformation *cpuidData, int maxEaxValue) {
@@ -378,7 +382,7 @@ static void managePipe(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1], int inde
 	for (int i = 0, j = index+1; j < argNum; i++)
 		strcpy(args2[i], args[j++]);
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < PROCESS_AMOUNT; i++) {
 		if (compareStrings(p1, processList[i]))
 			indexP1 = i;
 		if (compareStrings(p2, processList[i]))
@@ -443,7 +447,7 @@ void executeCommand(char * buffer) {
 	}
 
 	if (compareStrings(args[0], "help")) {
-		printf("-------COMMANDS------\n");
+		printf("-------BUILTIN------\n");
 		printf("1: help\n");
 		printf("2: inforeg\n");
 		printf("3: printmem\n");
@@ -456,9 +460,20 @@ void executeCommand(char * buffer) {
 		printf("10: kill\n");
 		printf("11: nice\n");
 		printf("12: block\n");
-		printf("13: loop\n");
-		printf("14: pipe\n");
-		printf("15: ps\n");
+		printf("13: pipe\n");
+		printf("14: ps\n");
+		printf("-------PROCESSES------\n");
+		printf("1: loop\n");
+		printf("2: cat\n");
+		printf("3: wc\n");
+		printf("4: filter\n");
+		printf("5: phylo\n");
+		printf("-------TESTS------\n");
+		printf("1: testmm\n");
+		printf("2: testprio\n");
+		printf("3: testprocesses\n");
+		printf("4: testsync\n");
+		printf("5: testnosync\n");
 	} 
 	else if (compareStrings(args[0], "inforeg")) {
 		Registers registers;
@@ -567,6 +582,27 @@ void executeCommand(char * buffer) {
 	}
 	else if (compareStrings(args[0], "filter")) {
 		createProcess((uint64_t)&filter, argNum, args, NULL, NULL);
+	}
+	else if (compareStrings(args[0], "phylo")) {
+		createProcess((uint64_t)&philo, argNum, args, NULL, NULL);
+	}
+	else if (compareStrings(args[0], "wc")) {
+		createProcess((uint64_t)&wc, argNum, args, NULL, NULL);
+	}
+	else if (compareStrings(args[0], "testmem")) {
+		test_mm();
+	}
+	else if (compareStrings(args[0], "testprio")) {
+		test_prio();
+	}
+	else if (compareStrings(args[0], "testprocesses")) {
+		test_processes();
+	}
+	else if (compareStrings(args[0], "testsync")) {
+		test_sync();
+	}
+	else if (compareStrings(args[0], "testnosync")) {
+		test_no_sync();
 	}
 	else if (compareStrings(args[0], "mem")) {
 		unsigned int mem[3];
