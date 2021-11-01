@@ -113,7 +113,6 @@ void test_processes(){
 
     }
     printf("Succeed\n");
-    executeCommand("ps");
     sys_sleep(4);
   }
 }
