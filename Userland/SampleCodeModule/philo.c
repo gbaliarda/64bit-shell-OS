@@ -200,6 +200,7 @@ void philo(int argc, const char argv[6][21]) {
       sys_exit();
     }
   }
+  endDining();
   sys_semClose(mutex);
   sys_exit();
 }
