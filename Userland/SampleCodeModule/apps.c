@@ -22,7 +22,7 @@ void loop(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) {
 		sys_exit();
 	}
 	while(1) {
-		printf("Hello World! My PID is: ");
+		printf("Hi from: ");
 		printInt(sys_getPid());
 		putChar('\n');
 		sys_sleep(delay);
