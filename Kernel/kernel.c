@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdint.h>
 #include <lib.h>
 #include <string.h>
@@ -58,10 +60,6 @@ void * initializeKernelBinary() {
 	return getStackBase();
 }
 
-void runShell() {
-	((EntryPoint)sampleCodeModuleAddress)();
-}
-
 int main() {	
 	ncPrint("[Kernel Main]");
 	ncNewline();
@@ -79,8 +77,6 @@ int main() {
 	ncClear();
 
 	load_idt();
-
-	// runShell();
 
 	return 0;
 }

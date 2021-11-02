@@ -1,10 +1,12 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "test_util.h"
 #include "../syscalls.h"
 #include "../libc.h"
 #include "tests.h"
 
 #define MAX_BLOCKS 128
-#define MAX_MEMORY 134217728*0.8 //Should be around 80% of memory managed by the MM
+#define MAX_MEMORY (134217728*0.8) //Should be around 80% of memory managed by the MM
 
 typedef struct MM_rq{
   void *address;

@@ -35,6 +35,8 @@ int compareStrings(char *str1, char *str2);
 
 uint64_t atoi(char *str, int *ok);
 
+int itos(int value, char* target, int initialIndex);
+
 uint64_t hex2int(char *hex, int *ok);
 
 void dtos(double num, char *buff);

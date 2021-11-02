@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./builtin.h"
 #include "./apps.h"
 #include "./syscalls.h"
@@ -76,14 +78,12 @@ void filter(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) {
 }
 
 void p1(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) {
-	for(int z = 0; z < 1; z++) {
-		printf("Cantidad de argumentos: "); printInt(argc); printf("\n");
-		for (int i = 0; i < argc; i++) {
-			printf(argv[i]);
-			printf(" ");
-		}
-		printf("\n");
+	printf("Cantidad de argumentos: "); printInt(argc); printf("\n");
+	for (int i = 0; i < argc; i++) {
+		printf(argv[i]);
+		printf(" ");
 	}
+	printf("\n");
 	sys_exit();
 }
 
