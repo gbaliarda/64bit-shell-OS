@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../include/naiveConsole.h"
 #include "keyboard.h"
 #include "time.h"
@@ -30,9 +32,9 @@ void rebootConsole() {
 		_hlt();
 		if (ticks_elapsed() % 9 == 0)
 			displayCursor();
-			unsigned char key = getInput();
-			if (key != 0)
-				break;
+		unsigned char key = getInput();
+		if (key != 0)
+			break;
 	}
 	ncClear();
 	ncPrint("> ");

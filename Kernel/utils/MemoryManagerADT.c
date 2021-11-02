@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #ifdef HEAP2
 
 #include "../include/memoryManagerADT.h"
@@ -7,21 +9,19 @@
 
 #define NULL ((void *) 0)
 
-typedef unsigned int size_t;
-
 typedef struct MemoryBlock {
 	struct MemoryBlock *nextFreeBlock;
-	size_t blockSize;
+	unsigned int blockSize;
 } MemoryBlock;
 
 static const uint16_t STRUCT_SIZE = ((sizeof(MemoryBlock) + (BYTE_ALIGNMENT - 1)) & ~BYTE_ALIGNMENT_MASK);
 
-#define MINIMUM_BLOCK_SIZE ((size_t)(STRUCT_SIZE * 2))
+#define MINIMUM_BLOCK_SIZE ((unsigned int)(STRUCT_SIZE * 2))
 
 typedef struct MemoryManagerCDT {
   MemoryBlock start;
   MemoryBlock end;
-  size_t freeBytesRemaining;
+  unsigned int freeBytesRemaining;
 } MemoryManagerCDT;
 
 MemoryManagerADT createMemoryManager(void *const restrict memoryForMemoryManager, void *const restrict managedMemory) {
@@ -31,7 +31,7 @@ MemoryManagerADT createMemoryManager(void *const restrict memoryForMemoryManager
   MemoryBlock *firstFreeBlock = (void *) managedMemory;
 
 	memoryManager->start.nextFreeBlock = (void *) firstFreeBlock;
-	memoryManager->start.blockSize = (size_t) 0;
+	memoryManager->start.blockSize = (unsigned int) 0;
 
 	memoryManager->end.blockSize = TOTAL_HEAP_SIZE;
 	memoryManager->end.nextFreeBlock = NULL;
@@ -44,7 +44,7 @@ MemoryManagerADT createMemoryManager(void *const restrict memoryForMemoryManager
 
 static void insertBlockIntoFreeList(MemoryManagerADT memoryManager, MemoryBlock *blockToInsert) {
   MemoryBlock *blockIterator = &memoryManager->start;
-  size_t blockSize = blockToInsert->blockSize;
+  unsigned int blockSize = blockToInsert->blockSize;
 						
 	while (blockIterator->nextFreeBlock->blockSize < blockSize)
     blockIterator = blockIterator->nextFreeBlock;
@@ -53,7 +53,7 @@ static void insertBlockIntoFreeList(MemoryManagerADT memoryManager, MemoryBlock 
 	blockIterator->nextFreeBlock = blockToInsert;
 }
 
-void *allocMem(MemoryManagerADT const memoryManager, size_t memoryToAllocate) {
+void *allocMem(MemoryManagerADT const memoryManager, unsigned int memoryToAllocate) {
 
   MemoryBlock *block, *previousBlock;
   void *blockToReturn = NULL;
@@ -113,15 +113,15 @@ void freeMem(MemoryManagerADT const memoryManager, void *block) {
 
 }
 
-size_t heapSize() {
+unsigned int heapSize() {
   return TOTAL_HEAP_SIZE;
 }
 
-size_t heapLeft(MemoryManagerADT mm) {
+unsigned int heapLeft(MemoryManagerADT mm) {
   return mm->freeBytesRemaining;
 }
 
-size_t usedHeap(MemoryManagerADT mm) {
+unsigned int usedHeap(MemoryManagerADT mm) {
   return heapSize() - heapLeft(mm);
 }
 

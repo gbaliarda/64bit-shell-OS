@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../include/semaphore.h"
 #include "../include/naiveConsole.h"
 
@@ -55,8 +57,10 @@ int sem_close(Semaphore *sem) {
     return -1;
   }
   
-  while(semIterator < size-1)
+  while(semIterator < size-1) {
     semaphores[semIterator] = semaphores[semIterator+1];
+    semIterator++;
+  }
   size--;
 
   free(sem);
@@ -130,7 +134,7 @@ void deleteProcessFromSemaphores(uint32_t pid) {
     for (int j = 0; j < semaphores[i]->waiting; j++) {
       if (semaphores[i]->queue[j]->pid == pid) {
         semaphores[i]->waiting--;
-        for (int k = 0; i < semaphores[i]->waiting; i++)
+        for (int k = 0; k < semaphores[i]->waiting; k++)
           semaphores[i]->queue[k] = semaphores[i]->queue[k+1];
         return;
       }

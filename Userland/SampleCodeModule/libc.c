@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./libc.h"
 #include "./syscalls.h"
 
@@ -95,8 +97,8 @@ uint64_t hex2int(char *hex, int *ok) {
           *ok = 0;
           return 0;
         }
-        if (byte >= '0' && byte <= '9') byte = byte - '0';
-        else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+        if (byte <= '9') byte = byte - '0';
+        else if (byte >= 'a') byte = byte - 'a' + 10;
         else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;    
         val = (val << 4) | (byte & 0xF);
     }

@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../include/pipes.h"
 #include "../include/naiveConsole.h"
 #include "../interruptions/interrupts.h"
@@ -320,8 +322,14 @@ static pcb *getPCB(ListNode *node, uint32_t pid) {
 }  
 
 void changeProcessPriority(uint32_t pid, uint8_t newPriority) {
-  if (pid <= 1 || newPriority <= 1)
+  if (pid <= 1) {
+    ncPrint("Cannot change shell priority\n");
     return;
+  }
+  if (newPriority <= 1 || newPriority > 10) {
+    ncPrint("Priority must be between 2 and 10");
+    return;
+  }
   
   pcb *pidPCB = getPCB(scheduler->start, pid);
   if (pidPCB == NULL)

@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../include/pipes.h"
 #include "../include/naiveConsole.h"
 
@@ -16,7 +18,7 @@ typedef struct pipe {
 } pipe;
 
 pipe *pipes[MAX_PIPES];
-uint8_t pipeAmount = 0;
+uint32_t pipeAmount = 0;
 uint8_t pipeIds = 0;
 
 int createPipe(fdPipe *f0, fdPipe *f1) {
