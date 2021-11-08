@@ -7,6 +7,7 @@
 #include "../include/scheduler.h"
 #include "../include/semaphore.h"
 #include "../include/pipes.h"
+#include "../include/shm.h"
 #include "../include/naiveConsole.h"
 
 static int sysNum;
@@ -92,6 +93,11 @@ int64_t syscallDispatcher(int64_t arg0, int64_t arg1, int64_t arg2, int64_t arg3
         return getCurrentPid();
     case 37:
         sleep((uint32_t) arg0);
+        return 1;
+    case 38:
+        return (int64_t) shmAttach((int) arg0);
+    case 39:
+        shmClose((int) arg0);
         return 1;
     default:
       return -1;

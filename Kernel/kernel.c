@@ -7,6 +7,7 @@
 #include <naiveConsole.h>
 #include "./include/mm.h"
 #include "./include/scheduler.h"
+#include "./include/shm.h"
 // Interrupts
 #include <keyboard.h>
 #include <interrupts.h>
@@ -69,6 +70,8 @@ int main() {
 	ncNewline();
 
 	initMemManager(memoryManagerAddress, heapModuleAddress);
+
+	shmInit();
 
 	// Creamos el primer proceso a mano
 	initScheduler();

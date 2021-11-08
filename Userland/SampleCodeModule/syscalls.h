@@ -57,4 +57,8 @@ uint32_t sys_getPid();
 
 void sys_sleep(unsigned int seconds);
 
+void *sys_shmAttach(int id);
+
+void sys_shmClose(int id);
+
 #endif

@@ -5,11 +5,11 @@
 #include "./syscalls.h"
 #include "./libc.h"
 
-#define PROCESS_QTY 10
+#define PROCESS_QTY 12
 #define BUILTIN_QTY 14
 
-char *processList[PROCESS_QTY] = { "p1", "p2", "p3", "p4", "p5", "loop", "cat", "wc", "filter", "phylo" };
-void (*processFunc[])(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) = { p1, p2, p3, p4, p5, loop, cat, wc, filter, philo };
+char *processList[PROCESS_QTY] = { "p1", "p2", "p3", "p4", "p5", "loop", "cat", "wc", "filter", "phylo", "p6", "p7" };
+void (*processFunc[])(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) = { p1, p2, p3, p4, p5, loop, cat, wc, filter, philo, p6, p7 };
 
 char *builtinList[BUILTIN_QTY] = { "help", "clear", "mem", "sem", "kill", "nice", "block", "pipe", "ps", "testmm", "testprio", "testproc", "testsync", "testnosync" };
 void (*builtinFunc[])(char args[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) = { help, clear, mem, sem, kill, nice, block, pipe, ps, test_mm, test_prio, test_processes, test_sync, test_no_sync };
@@ -131,6 +131,25 @@ void p5(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) {
 	Semaphore *sem = sys_semOpen(1, 0);
 	printf("Voy a despertar a p4!\n");
 	sys_semPost(sem);
+	sys_exit();
+}
+
+void p6(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) {
+	char *buff = (char *)sys_shmAttach(0);
+
+	buff[0] = 'h';
+	buff[1] = 'o';
+	buff[2] = 'l';
+	buff[3] = 'a';
+	buff[4] = 0;
+	sys_exit();
+}
+
+void p7(int argc, const char argv[MAX_ARG_AMT+1][MAX_ARG_COMMAND_LEN+1]) {
+	char *buff = (char *)sys_shmAttach(0);
+
+	printf(buff);
+	sys_shmClose(0);
 	sys_exit();
 }
 

@@ -28,6 +28,8 @@ GLOBAL sys_printPipes
 GLOBAL sys_yield
 GLOBAL sys_getPid
 GLOBAL sys_sleep
+GLOBAL sys_shmAttach
+GLOBAL sys_shmClose
 
 section .text
 
@@ -177,6 +179,16 @@ sys_getPid:
 
 sys_sleep:
   mov rax, 37
+  int 80h
+  ret
+
+sys_shmAttach:
+  mov rax, 38
+  int 80h
+  ret
+
+sys_shmClose:
+  mov rax, 39
   int 80h
   ret
 
